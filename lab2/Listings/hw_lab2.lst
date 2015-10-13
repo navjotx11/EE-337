@@ -1,0 +1,173 @@
+A51 MACRO ASSEMBLER  HW_LAB2                                                              08/04/2015 15:05:22 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\hw_lab2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE hw_lab2.asm SET(SMALL) DEBUG PRINT(.\Listings\hw_lab2.lst) OBJECT(.\Obj
+                      ects\hw_lab2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 000H
+  0090                 2     LED EQU P1
+0000 020091            3     LJMP MAIN
+                       4     
+0003                   5     delay:                         ;Total Delay Provided is D/2 sec
+                       6        USING 0
+0003 C004              7        PUSH AR4
+0005 C001              8        PUSH AR1
+0007 C002              9        PUSH AR2
+0009 C003             10        PUSH AR3
+000B C0E0             11        PUSH ACC
+000D 854F04           12        MOV AR4,4FH                 ;Or mention this Value inexplicitly
+0010                  13        LOOP:
+0010 7B0A             14        MOV R3,#10                  ;Module Provides delay of 0.5 sec
+0012                  15        BACK2:
+0012 7AC8             16         MOV R2,#200
+0014                  17         BACK1:
+0014 79FF             18          MOV R1,#0FFH
+0016                  19           BACK:
+0016 D9FE             20            DJNZ R1, BACK
+0018 DAFA             21            DJNZ R2, BACK1
+001A DBF6             22            DJNZ R3, BACK2
+001C DCF2             23            DJNZ R4, LOOP
+001E D0E0             24        POP ACC
+0020 D003             25        POP AR3
+0022 D002             26        POP AR2
+0024 D001             27        POP AR1
+0026 D004             28        POP AR4
+0028 22               29        RET   
+                      30     
+                      31     
+0029                  32     zeroOut:
+0029 C0E0             33        PUSH ACC
+002B C000             34        PUSH AR0
+002D C001             35        PUSH AR1
+002F A850             36        MOV R0,50H
+0031 A951             37        MOV R1,51H
+0033 7401             38        MOV A,#01H
+0035                  39        dozero:
+0035 04               40          INC A
+0036 F7               41              MOV @R1,A
+0037 09               42              INC R1
+0038 D8FB             43              DJNZ R0,dozero
+                      44        
+003A D001             45        POP AR1
+003C D000             46        POP AR0   
+003E D0E0             47        POP ACC
+0040 22               48        RET
+                      49        
+                      50        
+0041                  51     display:
+0041 C0E0             52        PUSH ACC
+0043 C001             53        PUSH AR1
+0045 C003             54        PUSH AR3
+0047 C04F             55        PUSH 4FH
+0049 AB50             56        MOV R3,50H
+004B A951             57        MOV R1,51H
+A51 MACRO ASSEMBLER  HW_LAB2                                                              08/04/2015 15:05:22 PAGE     2
+
+004D 754F02           58        MOV 4FH,#02H                 ; Set the delay to be 1 second
+0050                  59        dodisplay:
+0050 E7               60             MOV A,@R1                  ;Indirect Register to Register Not Allowed
+0051 540F             61             ANL A,#0FH
+0053 C4               62             SWAP A
+0054 F590             63             MOV LED,A
+0056 09               64             INC R1
+0057 120003           65             LCALL delay
+005A DBF4             66             DJNZ R3,dodisplay
+005C D04F             67        POP 4FH
+005E D003             68        POP AR3
+0060 D001             69        POP AR1
+0062 D0E0             70        POP ACC
+0064 22               71        RET
+                      72     
+                      73        
+0065                  74     sumOfSquares:
+0065 C0F0             75        PUSH B
+0067 C0E0             76        PUSH ACC
+0069 C000             77        PUSH AR0
+006B C001             78        PUSH AR1
+006D C003             79        PUSH AR3
+006F C004             80        PUSH AR4
+0071 A850             81        MOV R0,50H
+0073 A951             82        MOV R1,51H
+0075 7B01             83        MOV R3,#01H
+0077 7C00             84        MOV R4,#00H
+0079                  85        dososq:
+0079 EB               86         MOV A,R3
+007A 8BF0             87             MOV B,R3
+007C A4               88             MUL AB
+007D 2C               89             ADD A,R4
+007E F7               90             MOV @R1,A
+007F FC               91             MOV R4,A
+0080 09               92             INC R1
+0081 0B               93             INC R3
+0082 D8F5             94             DJNZ R0,dososq
+0084 D004             95        POP AR4
+0086 D003             96        POP AR3
+0088 D001             97        POP AR1
+008A D000             98        POP AR0
+008C D0E0             99        POP ACC
+008E D0F0            100        POP B
+0090 22              101        RET
+                     102        
+                     103     
+0091                 104     MAIN:
+0091 755160          105        MOV 51H,#60H               ;Store Value of P (Here, P=60H)
+0094 75500B          106        MOV 50H,#0BH               ;Store Value of N (Here, N=11)
+0097 754F0A          107        MOV 4FH,#0AH               ;Store Value of D
+009A 756101          108        MOV 61H,#01H               ;For Checking zeroOut 
+009D D294            109        SETB LED.4
+009F 120029          110        LCALL zeroOut
+00A2 7400            111        MOV A,#00H
+00A4 120041          112        LCALL display
+00A7 7400            113        MOV A,#00H
+00A9 120065          114        LCALL sumOfSquares
+00AC 7400            115        MOV A,#00H
+                     116     ;InfDelay: LCALL delay
+                     117      ;          CPL LED.4
+                     118       ;        SJMP InfDelay
+                     119       
+                     120     END
+                                     
+                                     
+                                     
+A51 MACRO ASSEMBLER  HW_LAB2                                                              08/04/2015 15:05:22 PAGE     3
+
+                                     
+A51 MACRO ASSEMBLER  HW_LAB2                                                              08/04/2015 15:05:22 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BACK . . . . . . .  C ADDR   0016H   A   
+BACK1. . . . . . .  C ADDR   0014H   A   
+BACK2. . . . . . .  C ADDR   0012H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+DISPLAY. . . . . .  C ADDR   0041H   A   
+DODISPLAY. . . . .  C ADDR   0050H   A   
+DOSOSQ . . . . . .  C ADDR   0079H   A   
+DOZERO . . . . . .  C ADDR   0035H   A   
+LED. . . . . . . .  D ADDR   0090H   A   
+LOOP . . . . . . .  C ADDR   0010H   A   
+MAIN . . . . . . .  C ADDR   0091H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+SUMOFSQUARES . . .  C ADDR   0065H   A   
+ZEROOUT. . . . . .  C ADDR   0029H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

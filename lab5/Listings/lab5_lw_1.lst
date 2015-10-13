@@ -1,0 +1,83 @@
+A51 MACRO ASSEMBLER  LAB5_LW_1                                                            08/25/2015 19:04:33 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab5_lw_1.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab5_lw_1.asm SET(SMALL) DEBUG PRINT(.\Listings\lab5_lw_1.lst) OBJECT(.
+                      \Objects\lab5_lw_1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;using timer 0
+                       2     
+0000                   3     org 00h
+0000 020027            4     ljmp main
+                       5     
+0003                   6     delay:
+                       7     using 0
+0003 C0E0              8     push acc
+0005 C000              9     push ar0
+0007 7881             10     mov r0,#81H         ;Indirect read from memory location 81H
+0009 E6               11     mov a,@r0
+000A F4               12     cpl a
+000B 2401             13     add a,#01
+000D F58A             14     mov TL0,a
+000F 08               15     inc r0              ;Carry flag is not affected by INC
+0010 E6               16     mov a,@r0
+0011 F4               17     cpl a
+0012 3400             18     addc a,#00H
+0014 F58C             19     mov TH0,a
+                      20     ;2's complement of the 16bit no. is now stored in T0
+0016 758901           21     mov TMOD,#01
+0019 D28C             22     setb TR0             ;Enable timer 0
+001B                  23     count:
+001B 308DFD           24     jnb TF0,count
+001E C28C             25     clr TR0              ;Stop timer
+0020 C28D             26     clr TF0              ;Clear overflow bit
+0022 D000             27     pop ar0
+0024 D0E0             28     pop acc
+0026 22               29     ret
+                      30     
+0027                  31     main:
+                      32     using 0
+0027 7881             33     mov r0,#81H
+0029 760A             34     mov @r0,#0Ah
+002B 08               35     inc r0
+002C 7600             36     mov @r0,#00h        ;Delay corresponding to 3EFFh would be generated
+                      37     ;mov p1,#0F0h
+002E                  38     blink:              ;To show on LED
+002E 759080           39     mov p1,#10000000B
+0031 120003           40     lcall delay 
+0034 759000           41     mov p1,#00000000B
+0037 120003           42     lcall delay
+003A 80F2             43     sjmp blink
+003C 80FE             44     stop: sjmp stop
+                      45     
+                      46     end
+A51 MACRO ASSEMBLER  LAB5_LW_1                                                            08/25/2015 19:04:33 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+BLINK. . . . . . .  C ADDR   002EH   A   
+COUNT. . . . . . .  C ADDR   001BH   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+MAIN . . . . . . .  C ADDR   0027H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+STOP . . . . . . .  C ADDR   003CH   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

@@ -1,0 +1,94 @@
+A51 MACRO ASSEMBLER  16_BIT_ADDITION                                                      07/28/2015 20:52:54 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\16_bit_addition.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE C:\Users\Navjot\Downloads\16_bit_addition.asm SET(SMALL) DEBUG PRINT(.\
+                      Listings\16_bit_addition.lst) OBJECT(.\Objects\16_bit_addition.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;-----------------------------------------
+                       2     ; CodeName : 16 bit 2's complement adder 
+                       3     ; Author   : Meet Pragnesh Shah
+                       4     ; Contact  : meetshah1995@ee.iitb.ac.in
+                       5     ;-----------------------------------------
+                       6      
+0000                   7     ORG 0000H
+                       8     
+0000 020122            9     LJMP MAIN
+                      10     
+                      11     
+                      12     ;----------------------------------------
+                      13     ; 2's Complement 16 bit addition
+                      14     ;----------------------------------------
+                      15     
+                      16     
+                      17     ;R0 and R1 should contain the address of two no.s
+                      18     ;location given by R0:-         MSB of 1st no.
+                      19     ;location given by R0+1:-       LSB of 1st no.
+                      20     ;location given by R1:-         MSB of 1st no.
+                      21     ;location given by R1+1:-       LSB of 1st no.
+                      22     ;location given by R0+2:-       CARRY   
+                      23     ;location given by R0+3:-       MSB OF ANS      
+                      24     ;location given by R0+4:-       LSB OF ANS
+                      25     
+                      26     
+0100                  27     ORG 100H
+0100                  28     ADDER_16BIT:
+0100 C3               29             CLR C
+0101 E561             30             MOV A,61H ;-- push the registers which will be affected by this subroutine 
+0103 2571             31             ADD A,71H
+0105 F564             32             MOV 64H,A
+0107 E560             33             MOV A,60H
+0109 3570             34             ADDC A,70H ;    but will be needed later        
+010B F563             35             MOV 63H,A
+010D 20D201           36             JB PSW.2 , RETURN
+0110 22               37             RET
+                      38             ;-- perform the addition/subtraction of 2 16-bit no.s
+                      39             ;-- you may use subroutine wrtten for addition of 2 8-bit no.s
+                      40             ;-- remember the no.s are given in 2's complement form
+                      41             
+                      42             ;-- take care when you set carry/borrow.
+                      43             
+                      44             ;-- store the result at appropriate locations.
+                      45     
+0111                  46             RETURN:
+0111 756201           47             MOV 62H,#01H    ;-- pop the registers
+0114 22               48             RET
+                      49     
+0115                  50     INIT:
+0115 75607F           51                     MOV 60H,#7FH   ;-- store the numbers to be added/subtracted at appropriate 
+                             location
+0118 7561FF           52                     MOV 61H,#0FFH   ;-- store the numbers to be added/subtracted at appropriate
+                              location
+011B 757000           53                     MOV 70H,#00H
+011E 757101           54                     MOV 71H,#01H
+0121 22               55             RET
+A51 MACRO ASSEMBLER  16_BIT_ADDITION                                                      07/28/2015 20:52:54 PAGE     2
+
+                      56     
+0122                  57     MAIN:
+0122 3115             58                     ACALL INIT
+0124 3100             59                     ACALL ADDER_16BIT
+                      60                     END
+                                             
+A51 MACRO ASSEMBLER  16_BIT_ADDITION                                                      07/28/2015 20:52:54 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ADDER_16BIT. . . .  C ADDR   0100H   A   
+INIT . . . . . . .  C ADDR   0115H   A   
+MAIN . . . . . . .  C ADDR   0122H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   0111H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

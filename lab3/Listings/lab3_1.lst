@@ -1,0 +1,55 @@
+A51 MACRO ASSEMBLER  LAB3_1                                                               08/11/2015 15:51:07 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab3_1.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab3_1.asm SET(SMALL) DEBUG PRINT(.\Listings\lab3_1.lst) OBJECT(.\Objec
+                      ts\lab3_1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; Program for Binary to Gray Code conversion
+                       2     
+0000                   3     ORG 000H
+0000 020019            4     LJMP main
+                       5     
+0003                   6     displaygray:
+                       7      USING 0
+0003 C0E0              8      PUSH ACC
+0005 C001              9      PUSH AR1
+0007 75900F           10      MOV P1,#0FH      ;Select the DIP switches
+000A A990             11      MOV R1,P1
+000C E590             12      MOV A,P1
+000E 03               13      RR A
+000F C2E3             14      CLR ACC.3
+0011 69               15      XRL A,R1 
+0012 C4               16      SWAP A
+0013 F590             17      MOV P1,A
+0015 D001             18      POP AR1
+0017 D0E0             19      POP ACC
+                      20     
+0019                  21     main:
+0019 120003           22     Infi: LCALL displaygray
+001C 80FB             23           SJMP Infi
+                      24               
+                      25     END
+A51 MACRO ASSEMBLER  LAB3_1                                                               08/11/2015 15:51:07 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+DISPLAYGRAY. . . .  C ADDR   0003H   A   
+INFI . . . . . . .  C ADDR   0019H   A   
+MAIN . . . . . . .  C ADDR   0019H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

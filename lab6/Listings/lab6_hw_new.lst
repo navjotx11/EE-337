@@ -1,0 +1,194 @@
+A51 MACRO ASSEMBLER  LAB6_HW_NEW                                                          09/01/2015 16:03:10 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab6_hw_new.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab6_hw_new.asm SET(SMALL) DEBUG PRINT(.\Listings\lab6_hw_new.lst) OBJE
+                      CT(.\Objects\lab6_hw_new.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 000h
+0000 020900            2     ljmp main
+                       3     
+                       4     ;-----------------------------------------------------------------------------
+000B                   5     org 000Bh
+000B C0E0              6     push acc
+000D C0D0              7     push psw
+000F 0E                8     inc r6           ;Used to measure 30ms (i.e. r6 =15)
+0010 A3                9     inc dptr
+0011 D0D0             10     pop psw
+0013 D0E0             11     pop acc
+0015 32               12     reti
+                      13     
+                      14     ;-----------------------------------------------------------------------------
+0200                  15     org 0200h
+                      16     
+0200                  17     conv2cpl2:      ;to store 2's complement corresponding to 2ms delay (#3E8h)
+0200 C0E0             18     push acc
+0202 C28C             19     clr TR0
+0204 74E8             20     mov a,#0E8h
+0206 F4               21     cpl a
+0207 2401             22     add a,#01
+0209 F58A             23     mov TL0,a
+020B 7403             24     mov a,#03h
+020D F4               25     cpl a
+020E 3400             26     addc a,#00h
+0210 F58C             27     mov TH0,a
+0212 D28C             28     setb TR0
+0214 D0E0             29     pop acc
+0216 22               30     ret
+                      31     
+0217                  32     delay2:                  ;2ms delay
+0217 C0E0             33     push acc
+0219 D28C             34     setb TR0
+021B D28D             35     setb TF0
+021D 208DFD           36     again: jb TF0,again
+                      37     ;mov a,dpl
+                      38     ;mov b,a                  ;b stores DPL
+0220 E582             39     mov a,dpl                 ;a stores DPL
+0222 B4F40A           40     cjne a,#0F4h,do
+0225 E583             41     mov a,dph
+0227 B40105           42     cjne a,#01h,do
+022A D0E0             43     pop acc
+022C 5157             44     acall readswitch         ;change value of a
+022E 22               45     ret
+022F                  46     do:
+022F C28D             47     clr TF0
+0231 C28C             48     clr TR0
+0233 D0E0             49     pop acc
+0235 22               50     ret
+                      51     
+                      52     ;------------------------------------------------------------------------------
+0236                  53     start:
+0236 5157             54     acall readswitch
+                      55     
+                      56     ;loop:
+                      57     ;mov r5,#33                    ;Repeat 30ms delay 33 times ~0.99sec
+A51 MACRO ASSEMBLER  LAB6_HW_NEW                                                          09/01/2015 16:03:10 PAGE     2
+
+                      58      
+                      59     
+                      60     
+                      61     
+                      62     
+                      63     
+                      64     
+                      65     
+                      66     
+                      67     
+                      68     
+                      69     
+                      70     
+                      71     
+                      72     
+                      73     
+                      74     
+                      75     
+                      76     
+                      77     
+                      78     
+                      79     
+                      80     
+0238                  81     del1:
+0238 F9               82     mov r1,a
+0239 600E             83     jz del2
+023B 759080           84     mov P1,#80h
+                      85     ;loop:
+                      86     ;cjne dptr,#1F4h,do
+                      87     ;acall readswitch
+023E                  88      do1:
+023E 5100             89      acall conv2cpl2
+0240 5117             90      acall delay2
+0242 D9FA             91      djnz r1,do1
+0244 B40F02           92      cjne a,#0Fh,del2
+0247 800A             93      sjmp rst
+                      94     ;-------------------------------------------------------------------------------------
+0249                  95     del2:
+0249 759000           96      mov P1,#00h
+024C                  97      do2: 
+024C 5100             98      acall conv2cpl2
+024E 5117             99      acall delay2
+0250 BE0FF9          100      cjne r6,#0Fh,do2
+0253                 101      rst:
+0253 7E00            102      mov r6,#00h
+0255 80E1            103      jmp del1
+                     104      
+                     105     ;-------------------------------------------------------------------------------------
+0257                 106     readswitch:                  ;store no. of times to repeat in acc
+0257 900000          107     mov dptr,#0000h
+025A 75900F          108     mov P1,#0Fh
+025D E590            109     mov a,P1
+025F 540F            110     anl a,#0Fh
+0261 C3              111     clr c
+0262 89F0            112     mov b,r1           ;store current reamaining delay value for del1
+0264 B5F003          113     cjne a,b,change1
+0267 7901            114     mov r1,#01h
+0269 22              115     ret 
+026A                 116     change1:
+026A 4009            117     jc change2
+026C C3              118     clr c
+026D C0E0            119     push acc           ;store read value
+026F 99              120     subb a,r1
+0270 29              121     add a,r1
+0271 F9              122     mov r1,a
+0272 D0E0            123     pop acc
+A51 MACRO ASSEMBLER  LAB6_HW_NEW                                                          09/01/2015 16:03:10 PAGE     3
+
+0274 22              124     ret
+0275                 125     change2:
+0275 7901            126     mov r1,#01h
+0277 22              127     ret
+                     128     
+                     129     ;--------------------------------------------------------------------------------------
+0900                 130     org 900h
+                     131     
+                     132     
+0900                 133     main:
+0900 758901          134     mov TMOD,#01h                 ;Set 16 bit counting mode for T0
+0903 D2AF            135     setb IE.7                    ;enable interrupts
+0905 D2A9            136     setb ET0
+0907 120236          137     lcall start
+                     138     
+                     139     END
+A51 MACRO ASSEMBLER  LAB6_HW_NEW                                                          09/01/2015 16:03:10 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AGAIN. . . . . . .  C ADDR   021DH   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CHANGE1. . . . . .  C ADDR   026AH   A   
+CHANGE2. . . . . .  C ADDR   0275H   A   
+CONV2CPL2. . . . .  C ADDR   0200H   A   
+DEL1 . . . . . . .  C ADDR   0238H   A   
+DEL2 . . . . . . .  C ADDR   0249H   A   
+DELAY2 . . . . . .  C ADDR   0217H   A   
+DO . . . . . . . .  C ADDR   022FH   A   
+DO1. . . . . . . .  C ADDR   023EH   A   
+DO2. . . . . . . .  C ADDR   024CH   A   
+DPH. . . . . . . .  D ADDR   0083H   A   
+DPL. . . . . . . .  D ADDR   0082H   A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+MAIN . . . . . . .  C ADDR   0900H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+READSWITCH . . . .  C ADDR   0257H   A   
+RST. . . . . . . .  C ADDR   0253H   A   
+START. . . . . . .  C ADDR   0236H   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

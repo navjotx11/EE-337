@@ -1,0 +1,112 @@
+A51 MACRO ASSEMBLER  3_DISPLAY                                                            08/11/2015 14:41:53 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\3_display.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE 3_display.asm SET(SMALL) DEBUG PRINT(.\Listings\3_display.lst) OBJECT(.
+                      \Objects\3_display.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 000H
+  0090                 2     LED EQU P1
+0000 020051            3     LJMP main
+                       4             
+                       5     
+0003                   6     delay:                         ;Total Delay Provided is D/2 sec
+                       7        USING 0
+0003 C004              8        PUSH AR4
+0005 C001              9        PUSH AR1
+0007 C002             10        PUSH AR2
+0009 C003             11        PUSH AR3
+000B C0E0             12        PUSH ACC
+000D 854F04           13        MOV AR4,4FH                 ;Or mention this Value inexplicitly
+0010                  14        LOOP:
+0010 7B0A             15        MOV R3,#10                  ;Module Provides delay of 0.5 sec
+0012                  16        BACK2:
+0012 7AC8             17         MOV R2,#200
+0014                  18         BACK1:
+0014 79FF             19          MOV R1,#0FFH
+0016                  20           BACK:
+0016 D9FE             21            DJNZ R1, BACK
+0018 DAFA             22            DJNZ R2, BACK1
+001A DBF6             23            DJNZ R3, BACK2
+001C DCF2             24            DJNZ R4, LOOP
+001E D0E0             25        POP ACC
+0020 D003             26        POP AR3
+0022 D002             27        POP AR2
+0024 D001             28        POP AR1
+0026 D004             29        POP AR4
+0028 22               30        RET
+                      31     
+0029                  32     display:
+0029 C0E0             33        PUSH ACC
+002B C001             34        PUSH AR1
+002D C003             35        PUSH AR3
+002F C04F             36        PUSH 4FH
+0031 AB90             37        MOV R3,P1
+0033 EB               38        MOV A,R3
+0034 540F             39        ANL A,#0FH
+0036 FB               40        MOV R3,A
+0037 A951             41        MOV R1,51H
+0039 754F02           42        MOV 4FH,#02H                 ; Set the delay to be 1 second
+003C                  43        dodisplay:
+003C E7               44             MOV A,@R1                  ;Indirect Register to Register Not Allowed
+003D 540F             45             ANL A,#0FH
+003F C4               46             SWAP A
+0040 F590             47             MOV LED,A
+0042 09               48             INC R1
+0043 120003           49             LCALL delay
+0046 DBF4             50             DJNZ R3,dodisplay
+0048 D04F             51        POP 4FH
+004A D003             52        POP AR3
+004C D001             53        POP AR1
+004E D0E0             54        POP ACC
+0050 22               55        RET
+                      56        
+0051                  57     main:
+A51 MACRO ASSEMBLER  3_DISPLAY                                                            08/11/2015 14:41:53 PAGE     2
+
+                      58       USING 0 
+0051 75500B           59       MOV 50H,#0BH     
+0054 755160           60       MOV 51H,#60H
+0057 A951             61       MOV R1,51H
+0059 7401             62       MOV A,#01H
+005B AA50             63       MOV R2,50H
+005D                  64       looper:
+005D F7               65        MOV @R1,A                 
+005E 09               66        INC R1
+005F 04               67        INC A
+0060 DAFB             68        DJNZ R2,looper
+0062 120029           69        LCALL display
+                      70     END
+A51 MACRO ASSEMBLER  3_DISPLAY                                                            08/11/2015 14:41:53 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+BACK . . . . . . .  C ADDR   0016H   A   
+BACK1. . . . . . .  C ADDR   0014H   A   
+BACK2. . . . . . .  C ADDR   0012H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+DISPLAY. . . . . .  C ADDR   0029H   A   
+DODISPLAY. . . . .  C ADDR   003CH   A   
+LED. . . . . . . .  D ADDR   0090H   A   
+LOOP . . . . . . .  C ADDR   0010H   A   
+LOOPER . . . . . .  C ADDR   005DH   A   
+MAIN . . . . . . .  C ADDR   0051H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

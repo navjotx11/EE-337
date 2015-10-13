@@ -1,0 +1,48 @@
+A51 MACRO ASSEMBLER  8BITADDER                                                            07/28/2015 15:20:13 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\8bitadder.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE 8bitadder.asm SET(SMALL) DEBUG PRINT(.\Listings\8bitadder.lst) OBJECT(.
+                      \Objects\8bitadder.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;8-bit adder
+                       2     
+0000                   3     ORG 00H
+0000 020090            4             LJMP MAIN
+                       5             
+0100                   6     ORG 100H
+                       7     
+0100 E4                8     ADDER: CLR A
+0101 2550              9            ADD A,50H
+0103 2560             10                ADD A,60H
+0105 F570             11                MOV 70H,A
+0107 22               12                RET
+                      13                
+0090                  14     ORG 90H
+                      15             
+0090 755077           16     MAIN: MOV 50H,#77H
+0093 756090           17           MOV 60H,#90H
+0096 120100           18               LCALL ADDER
+                      19               
+0099 80FE             20     FIN:  SJMP FIN
+*** WARNING #A41 IN 20 (8bitadder.asm, LINE 20): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  8BITADDER                                                            07/28/2015 15:20:13 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ADDER. . . . . . .  C ADDR   0100H   A   
+FIN. . . . . . . .  C ADDR   0099H   A   
+MAIN . . . . . . .  C ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)
