@@ -1,0 +1,3 @@
+".\Objects\lab6_lw_rea.obj" 
+TO ".\Objects\lab6_lw_rea" 
+PRINT(".\Listings\lab6_lw_rea.m51") RAMSIZE(256) 

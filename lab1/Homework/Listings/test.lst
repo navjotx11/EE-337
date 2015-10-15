@@ -1,0 +1,48 @@
+A51 MACRO ASSEMBLER  TEST                                                                 08/22/2015 00:49:42 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\test.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE test.asm SET(SMALL) DEBUG PRINT(.\Listings\test.lst) OBJECT(.\Objects\t
+                      est.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 00H
+0000 020014            2     LJMP MAIN
+                       3     
+0003                   4     DO:
+0003 747C              5      MOV A,#7CH
+0005 2401              6      ADD A,#01H
+0007 F580              7      MOV 80H,A
+0009 858061            8      MOV 61H,80H
+000C 20D201            9      JB PSW.2,RETURN
+000F 22               10      RET
+                      11      
+0010                  12     RETURN:
+0010 756001           13      MOV 60H,#01H
+0013 22               14      RET 
+                      15     
+0014                  16     MAIN:
+0014 756199           17      MOV 61H,#99H
+0017 120003           18      LCALL DO  
+                      19     
+                      20     End
+A51 MACRO ASSEMBLER  TEST                                                                 08/22/2015 00:49:42 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DO . . . . . . . .  C ADDR   0003H   A   
+MAIN . . . . . . .  C ADDR   0014H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   0010H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

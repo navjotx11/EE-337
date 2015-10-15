@@ -1,0 +1,1 @@
+"sumpartN.asm" SET (SMALL) DEBUG PRINT(.\Listings\sumpartN.lst) OBJECT(.\Objects\sumpartN.obj) EP

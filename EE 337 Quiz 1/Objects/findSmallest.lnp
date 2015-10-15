@@ -1,0 +1,3 @@
+".\Objects\ques1.obj" 
+TO ".\Objects\findSmallest" 
+PRINT(".\Listings\findSmallest.m51") RAMSIZE(256) 

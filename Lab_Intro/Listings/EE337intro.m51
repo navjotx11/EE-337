@@ -1,0 +1,70 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        07/27/2015  19:58:52  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\good.obj TO .\Objects\EE337intro PRINT (.\Listings\EE337intro.m51) RAMSIZE (256)
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\good.obj (GOOD)
+
+
+LINK MAP OF MODULE:  .\Objects\EE337intro (GOOD)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     010FH     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\EE337intro (GOOD)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        GOOD
+  C:0105H         SYMBOL        BACK
+  C:0050H         SYMBOL        DELAY
+  C:005AH         SYMBOL        DELAY1
+  C:010DH         SYMBOL        FIN
+  D:0080H         SYMBOL        LED
+  C:0100H         SYMBOL        MAIN
+  D:0080H         SYMBOL        P0
+  D:00D0H         SYMBOL        PSW
+  C:0000H         LINE#         9
+  C:0050H         LINE#         17
+  C:0052H         LINE#         18
+  C:0054H         LINE#         19
+  C:0056H         LINE#         21
+  C:0058H         LINE#         22
+  C:005AH         LINE#         24
+  C:005BH         LINE#         25
+  C:005DH         LINE#         26
+  C:005FH         LINE#         28
+  C:0061H         LINE#         29
+  C:0063H         LINE#         30
+  C:0065H         LINE#         31
+  C:0100H         LINE#         36
+  C:0103H         LINE#         37
+  C:0105H         LINE#         38
+  C:0107H         LINE#         39
+  C:010AH         LINE#         40
+  C:010BH         LINE#         41
+  C:010DH         LINE#         43
+  -------         ENDMOD        GOOD
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      07/27/2015  19:58:52  PAGE 2
+
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0028H BYTE ( 1%) *
+******************************************************************************
+
+Program Size: data=8.0 xdata=0 code=271
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,90 @@
+A51 MACRO ASSEMBLER  16BITADDER                                                           07/29/2015 13:11:31 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\16bitadder.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Labwork\16bitadder.asm SET(SMALL) DEBUG PRINT(.\Listings\16bitadder.lst
+                      ) OBJECT(.\Objects\16bitadder.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0000H
+0000 020100            2     LJMP MAIN
+                       3     
+                       4     ;R0 and R1 should contain the address of two no.s
+                       5     ;location given by R0:-         MSB of 1st no.
+                       6     ;location given by R0+1:-       LSB of 1st no.
+                       7     ;location given by R1:-         MSB of 1st no.
+                       8     ;location given by R1+1:-       LSB of 1st no.
+                       9     ;location given by R0+2:-       CARRY   
+                      10     ;location given by R0+3:-       MSB OF ANS      
+                      11     ;location given by R0+4:-       LSB OF ANS
+                      12     
+                      13     ;-- remember the no.s are given in 2's complement form
+                      14     ;-- take care when you set carry/borrow.
+                      15     ;-- store the result at appropriate locations.
+                      16             
+                      17     ;---------------------------------------------------------;
+                      18     ;this function adds and stores result in appropriate location
+0003                  19     ADDER_16BIT:
+                      20         
+0003 E561             21             MOV A,61H
+0005 2571             22             ADD A,71H
+0007 F564             23             MOV 64H,A           ;LSB of Result
+0009 E4               24             CLR A
+                      25             ;ADDC A,#00H         ;Add A+CY+Data
+000A F566             26             MOV 66H,A
+000C E560             27             MOV A,60H
+000E 3570             28             ADDC A,70H          ; <- Used at appropriate location for PSW;;;;;;;;;;;;;;;;
+0010 F563             29             MOV 63H,A           ;MSB of Result
+0012 20D201           30             JB PSW.2,RETURN     ;Check if OV
+0015 22               31             RET
+                      32             
+0016                  33     RETURN: 
+0016 756201           34             MOV 62H,#01H        ;Discard or Accept Results
+0019 22               35             RET
+                      36             
+001A                  37     INIT:
+                      38             ;-- store the numbers to be added/subtracted at appropriate location
+001A 7560FF           39             MOV 60H,#0FFH    ;MSB of N1
+001D 7561FF           40             MOV 61H,#0FFH    ;LSB of N1
+0020 757080           41             MOV 70H,#80H    ;MSB of N2
+0023 757100           42             MOV 71H,#00H    ;LSB of N2
+0026 7860             43             MOV R0,#60H     ;Store Locations of N1
+0028 7970             44             MOV R1,#70H     ;Store Locations of N2
+002A 22               45             RET
+                      46     
+                      47     
+0100                  48     ORG 0100H
+0100                  49     MAIN:
+0100 111A             50             ACALL INIT
+0102 1103             51             ACALL ADDER_16BIT
+                      52     
+0104                  53     STOP: 
+0104 80FE             54         SJMP STOP
+                      55     END
+                             
+                             ; NOTE WHEN TO USE PSW.OV VALUE..... IT TAKES THE OV VALUE ONLY FOR THE PREV. ADDITION
+A51 MACRO ASSEMBLER  16BITADDER                                                           07/29/2015 13:11:31 PAGE     2
+
+                             ; See Updation of PSW.OV Bit
+A51 MACRO ASSEMBLER  16BITADDER                                                           07/29/2015 13:11:31 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ADDER_16BIT. . . .  C ADDR   0003H   A   
+INIT . . . . . . .  C ADDR   001AH   A   
+MAIN . . . . . . .  C ADDR   0100H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   0016H   A   
+STOP . . . . . . .  C ADDR   0104H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

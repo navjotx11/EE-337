@@ -1,0 +1,184 @@
+A51 MACRO ASSEMBLER  LAB6_HW                                                              08/31/2015 18:16:35 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab6_hw.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab6_hw.asm SET(SMALL) DEBUG PRINT(.\Listings\lab6_hw.lst) OBJECT(.\Obj
+                      ects\lab6_hw.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 000h
+0000 020900            2     ljmp main
+                       3     
+000B                   4     org 000Bh           ; ISR for timer T0 overflow, should reset when #OV,TH0,TH0= 1E8480
+000B 5100              5     acall sec1time
+                       6     
+000D 32                7     reti
+                       8     
+001B                   9     org 001Bh
+001B C0E0             10     push acc
+001D C0D0             11     push psw
+001F 0E               12     inc r6           ;Used to measure 30ms (i.e. r6 =15)
+0020 D0D0             13     pop psw
+0022 D0E0             14     pop acc
+0024 32               15     reti
+                      16     
+0200                  17     org 0200h
+                      18     
+0200                  19     sec1time:
+0200 C0E0             20     push acc
+0202 C0D0             21     push psw
+0204 0D               22     inc r5             ;Used to measure overflow for 1sec timer (i.e. r5=1Eh)
+0205 510C             23     acall reset
+0207 D0D0             24     pop psw 
+0209 D0E0             25     pop acc
+020B 22               26     ret
+                      27     
+020C                  28     reset:
+020C BD1E16           29     cjne r5,#1Eh,norst
+020F C28E             30     clr TR1        ;stop T1
+                      31     ;clr TF1
+0211 C28C             32     clr TR0        ;stop T0
+                      33     ;clr TF0        ;clear T0 overflow
+0213 D0E0             34     pop acc        ;exit reset
+0215 D0E0             35     pop acc        ;exit reset
+0217 D0D0             36     pop psw 
+0219 D0E0             37     pop acc
+021B D0E0             38     pop acc        ;exit sec1time
+021D D0E0             39     pop acc        ;exit sec1time
+021F D0E0             40     pop acc        ;POP PC
+0221 D0E0             41     pop acc        ;POP PC
+0223 8035             42     jmp start 
+                      43     
+0225                  44     norst: 
+0225 5128             45      acall conv2cpl1
+                      46     ; clr TF0        ;clear T0 overflow
+0227 22               47      ret
+                      48     
+0228                  49     conv2cpl1:      ;to store 2's complement corresponding to 1sec      
+0228 C0E0             50     push acc
+022A 7480             51     mov a,#080h
+022C F4               52     cpl a
+022D 2401             53     add a,#01
+022F F58A             54     mov TL0,a
+0231 7484             55     mov a,#84h
+0233 F4               56     cpl a
+0234 3400             57     addc a,#00h
+A51 MACRO ASSEMBLER  LAB6_HW                                                              08/31/2015 18:16:35 PAGE     2
+
+0236 F58C             58     mov TH0,a
+0238 D0E0             59     pop acc
+023A 22               60     ret
+                      61     
+023B                  62     conv2cpl2:      ;to store 2's complement corresponding to 2ms delay (#3E8h)
+023B C0E0             63     push acc
+023D 74E8             64     mov a,#0E8h
+023F F4               65     cpl a
+0240 2401             66     add a,#01
+0242 F58B             67     mov TL1,a
+0244 7403             68     mov a,#03h
+0246 F4               69     cpl a
+0247 3400             70     addc a,#00h
+0249 F58D             71     mov TH1,a
+024B D0E0             72     pop acc
+024D 22               73     ret
+                      74     
+024E                  75     delay2:                  ;2ms delay
+024E D28E             76     setb TR1
+0250 D28F             77     setb TF1
+0252 208FFD           78     again: jb TF1,again     
+0255 C28F             79     clr TF1
+0257 C28E             80     clr TR1
+0259 22               81     ret
+                      82     
+025A                  83     start:
+025A D2B9             84     setb IP.1
+025C 758109           85     mov SP,#09h
+025F 758911           86     mov TMOD,#11h                 ;Set 16 bit counting mode for both timers
+0262 75900F           87     mov P1,#0Fh
+0265 E590             88     mov a,P1
+0267 540F             89     anl a,#0Fh
+0269 75F002           90     mov b,#02
+026C A4               91     mul ab                       ;multiply input by 2, this should be the delay in ms
+                      92     ;we need to repeat a*2ms
+026D D2AF             93     setb IE.7                    ;enable interrupts
+026F D2A9             94     setb ET0                     ;enable interrupts for T0 overflow
+0271 5128             95     acall conv2cpl1
+0273 7D00             96     mov r5,#00h                  ;used to store overflow for T0
+0275 D28C             97     setb TR0                     ;start 1sec timer
+                      98     ;mov r6,#00h                 ;used for implementing 30ms delay
+0277 7408             99     mov a,#08
+0279                 100     do:
+0279 D2AB            101      setb ET1                    ;enable interrupt for T0 overflow
+027B F9              102      mov r1,a
+027C 7E00            103      mov r6,#00h
+027E                 104      rep:
+027E 513B            105      acall conv2cpl2
+0280 759080          106      mov P1,#80h                 ;glow LED
+0283 514E            107      acall delay2
+0285 D9F7            108      djnz r1,rep            ;Keep LED glowing for k*2ms
+0287 759000          109      mov P1,#00h
+028A                 110      again2: 
+028A 514E            111      acall delay2
+028C 513B            112      acall conv2cpl2
+028E BE0FF9          113      cjne r6,#0Fh,again2
+0291 C28E            114      clr TR1                     ;stop timer
+0293 80E4            115      sjmp do
+                     116      
+0900                 117     org 900h
+                     118     
+0900                 119     main:
+0900 12025A          120     lcall start
+                     121     
+                     122     END
+                             
+A51 MACRO ASSEMBLER  LAB6_HW                                                              08/31/2015 18:16:35 PAGE     3
+
+                             
+                             
+                             
+                             
+A51 MACRO ASSEMBLER  LAB6_HW                                                              08/31/2015 18:16:35 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AGAIN. . . . . . .  C ADDR   0252H   A   
+AGAIN2 . . . . . .  C ADDR   028AH   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CONV2CPL1. . . . .  C ADDR   0228H   A   
+CONV2CPL2. . . . .  C ADDR   023BH   A   
+DELAY2 . . . . . .  C ADDR   024EH   A   
+DO . . . . . . . .  C ADDR   0279H   A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+ET1. . . . . . . .  B ADDR   00A8H.3 A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+IP . . . . . . . .  D ADDR   00B8H   A   
+MAIN . . . . . . .  C ADDR   0900H   A   
+NORST. . . . . . .  C ADDR   0225H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+REP. . . . . . . .  C ADDR   027EH   A   
+RESET. . . . . . .  C ADDR   020CH   A   
+SEC1TIME . . . . .  C ADDR   0200H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+START. . . . . . .  C ADDR   025AH   A   
+TF1. . . . . . . .  B ADDR   0088H.7 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TH1. . . . . . . .  D ADDR   008DH   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TL1. . . . . . . .  D ADDR   008BH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+TR1. . . . . . . .  B ADDR   0088H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

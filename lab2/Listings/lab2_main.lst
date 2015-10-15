@@ -1,0 +1,210 @@
+A51 MACRO ASSEMBLER  LAB2_MAIN                                                            08/06/2015 23:30:52 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab2_main.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab2_main.asm SET(SMALL) DEBUG PRINT(.\Listings\lab2_main.lst) OBJECT(.
+                      \Objects\lab2_main.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 000H
+  0090                 2     LED EQU P1
+0000 0200B3            3     LJMP MAIN
+                       4     
+0003                   5     delay:                        ;Total Delay Provided is D/2 seconds
+                       6        USING 0                    ;where D is stored in location 4FH
+0003 C004              7        PUSH AR4
+0005 C001              8        PUSH AR1
+0007 C002              9        PUSH AR2
+0009 C003             10        PUSH AR3
+000B C0E0             11        PUSH ACC
+000D AC4F             12        MOV R4,4FH                 ;Or mention this Value inexplicitly
+000F                  13        LOOP:
+000F 7B0A             14        MOV R3,#10                 ;Module Provides delay of 0.5 sec
+0011                  15        BACK2:
+0011 7AC8             16         MOV R2,#200
+0013                  17         BACK1:
+0013 79FF             18          MOV R1,#0FFH
+0015                  19           BACK:
+0015 D9FE             20            DJNZ R1, BACK
+0017 DAFA             21            DJNZ R2, BACK1
+0019 DBF6             22            DJNZ R3, BACK2
+001B DCF2             23            DJNZ R4, LOOP
+001D D0E0             24        POP ACC
+001F D003             25        POP AR3
+0021 D002             26        POP AR2
+0023 D001             27        POP AR1
+0025 D004             28        POP AR4
+0027 22               29        RET   
+                      30     
+                      31     
+0028                  32     zeroOut:                         ;Set an array to zero
+0028 C000             33        PUSH AR0
+002A C001             34        PUSH AR1
+002C A850             35        MOV R0,50H
+002E A951             36        MOV R1,51H
+0030                  37        dozero:
+0030 7700             38              MOV @R1,#00H
+0032 09               39              INC R1
+0033 D8FB             40              DJNZ R0,dozero
+0035 D001             41        POP AR1
+0037 D000             42        POP AR0   
+0039 22               43        RET
+                      44        
+                      45        
+003A                  46     display:                          ;Function to display on LED
+003A C0E0             47        PUSH ACC
+003C C001             48        PUSH AR1
+003E C003             49        PUSH AR3
+0040 C04F             50        PUSH 4FH
+0042 AB50             51        MOV R3,50H
+0044 A951             52        MOV R1,51H
+0046 754F02           53        MOV 4FH,#02
+0049                  54        dodisplay:
+0049 E7               55             MOV A,@R1                  
+004A 540F             56             ANL A,#0FH
+004C C4               57             SWAP A
+A51 MACRO ASSEMBLER  LAB2_MAIN                                                            08/06/2015 23:30:52 PAGE     2
+
+004D F590             58             MOV LED,A
+004F 09               59             INC R1
+0050 120003           60             LCALL delay
+0053 DBF4             61             DJNZ R3,dodisplay
+0055 D04F             62        POP 4FH
+0057 D003             63        POP AR3
+0059 D001             64        POP AR1
+005B D0E0             65        POP ACC
+005D 22               66        RET
+                      67     
+                      68        
+005E                  69     sumOfSquares:                 ;Function to implement sum of squares
+005E C0F0             70        PUSH B
+0060 C0E0             71        PUSH ACC
+0062 C000             72        PUSH AR0
+0064 C001             73        PUSH AR1
+0066 C003             74        PUSH AR3
+0068 C004             75        PUSH AR4
+006A A850             76        MOV R0,50H
+006C A951             77        MOV R1,51H
+006E 7B01             78        MOV R3,#01H
+0070 7C00             79        MOV R4,#00H
+0072                  80        dososq:
+0072 EB               81         MOV A,R3
+0073 8BF0             82             MOV B,R3
+0075 A4               83             MUL AB
+0076 2C               84             ADD A,R4
+0077 F7               85             MOV @R1,A
+0078 FC               86             MOV R4,A
+0079 09               87             INC R1
+007A 0B               88             INC R3
+007B D8F5             89             DJNZ R0,dososq
+007D D004             90        POP AR4
+007F D003             91        POP AR3
+0081 D001             92        POP AR1
+0083 D000             93        POP AR0
+0085 D0E0             94        POP ACC
+0087 D0F0             95        POP B
+0089 22               96        RET
+                      97     
+008A                  98     memcpy:                              ;Function to copy values for A to B
+                      99     USING 0
+008A C000            100      PUSH AR0
+008C C001            101      PUSH AR1
+008E C002            102      PUSH AR2 
+0090 C0E0            103      PUSH ACC
+0092                 104       dopush:                            ;Push all A values
+0092 AA50            105        MOV R2,50H
+0094 E551            106        MOV A,51H
+0096 2A              107        ADD A,R2
+0097 F9              108        MOV R1,A
+0098 19              109        DEC R1
+0099                 110        loop1:
+0099 E7              111         MOV A,@R1
+009A C0E0            112         PUSH ACC
+009C 19              113         DEC R1
+009D DAFA            114             DJNZ R2,loop1   
+009F                 115       dopop:                            ;Pop all A values to B
+009F AA50            116        MOV R2,50H
+00A1 A852            117        MOV R0,52H
+00A3                 118        loop3:
+00A3 D001            119         POP AR1
+00A5 E9              120             MOV A,R1
+00A6 F6              121             MOV @R0,A
+00A7 08              122         INC R0
+00A8 DAF9            123             DJNZ R2,loop3
+A51 MACRO ASSEMBLER  LAB2_MAIN                                                            08/06/2015 23:30:52 PAGE     3
+
+00AA D0E0            124      POP ACC
+00AC D002            125      POP AR2
+00AE D001            126      POP AR1
+00B0 D000            127      POP AR0
+00B2 22              128      RET
+                     129     
+                     130     
+                     131     ;======================================MAIN=============================================
+                     132     
+00B3                 133     MAIN:
+00B3 7581CF          134     MOV SP,#0CFH;-----------------------Initialize STACK POINTER
+00B6 755007          135     MOV 50H,#07H;------------------------N memory locations of Array A
+00B9 755160          136     MOV 51H,#60H;------------------------Array A start location
+00BC 120028          137     LCALL zeroOut;----------------------Clear memory
+00BF 755007          138     MOV 50H,#07H;------------------------N memory locations of Array B
+00C2 755160          139     MOV 51H,#60H;------------------------Array B start location
+00C5 120028          140     LCALL zeroOut;----------------------Clear memory
+00C8 755007          141     MOV 50H,#07H;------------------------N memory locations of Array A
+00CB 755160          142     MOV 51H,#60H;------------------------Array A start location
+00CE 12005E          143     LCALL sumOfSquares;-----------------Write at memory location
+00D1 755007          144     MOV 50H,#07H;------------------------N elements of Array A to be copied in Array B
+00D4 755160          145     MOV 51H,#60H;------------------------Array A start location
+00D7 75525B          146     MOV 52H,#5BH;------------------------Array B start location
+00DA 12008A          147     LCALL memcpy;-----------------------Copy block of memory to other location
+00DD 755007          148     MOV 50H,#07H;------------------------N memory locations of Array B
+00E0 755165          149     MOV 51H,#65H;------------------------Array B start location
+00E3 754F02          150     MOV 4FH,#02H;------------------------User defined delay value
+00E6 12003A          151     LCALL display;----------------------Display the last four bits of elements on LEDs
+00E9 80FE            152     here:SJMP here;---------------------WHILE loop(Infinite Loop)
+                     153     END
+                             ;------------------------------------END MAIN-------------------------------------------
+A51 MACRO ASSEMBLER  LAB2_MAIN                                                            08/06/2015 23:30:52 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BACK . . . . . . .  C ADDR   0015H   A   
+BACK1. . . . . . .  C ADDR   0013H   A   
+BACK2. . . . . . .  C ADDR   0011H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+DISPLAY. . . . . .  C ADDR   003AH   A   
+DODISPLAY. . . . .  C ADDR   0049H   A   
+DOPOP. . . . . . .  C ADDR   009FH   A   
+DOPUSH . . . . . .  C ADDR   0092H   A   
+DOSOSQ . . . . . .  C ADDR   0072H   A   
+DOZERO . . . . . .  C ADDR   0030H   A   
+HERE . . . . . . .  C ADDR   00E9H   A   
+LED. . . . . . . .  D ADDR   0090H   A   
+LOOP . . . . . . .  C ADDR   000FH   A   
+LOOP1. . . . . . .  C ADDR   0099H   A   
+LOOP3. . . . . . .  C ADDR   00A3H   A   
+MAIN . . . . . . .  C ADDR   00B3H   A   
+MEMCPY . . . . . .  C ADDR   008AH   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+SUMOFSQUARES . . .  C ADDR   005EH   A   
+ZEROOUT. . . . . .  C ADDR   0028H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

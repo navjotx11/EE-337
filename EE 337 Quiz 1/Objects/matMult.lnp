@@ -1,0 +1,3 @@
+".\Objects\ques2.obj" 
+TO ".\Objects\matMult" 
+PRINT(".\Listings\matMult.m51") RAMSIZE(256) 

@@ -1,0 +1,405 @@
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab4_lw.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab4_lw.asm SET(SMALL) DEBUG PRINT(.\Listings\lab4_lw.lst) OBJECT(.\Obj
+                      ects\lab4_lw.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+  00A0                 1     LCD_data equ P2    ;LCD Data port
+  0080                 2     LCD_rs   equ P0.0  ;LCD Register Select
+  0081                 3     LCD_rw   equ P0.1  ;LCD Read/Write
+  0082                 4     LCD_en   equ P0.2  ;LCD Enable
+                       5     
+                       6     
+0000                   7     ORG 000H
+0000 0201B5            8     ljmp main
+                       9     
+0003                  10     ASCIICONV:               ;Subroutine returns lower nibble in B and higher nibble in A
+                      11     using 0
+0003 C002             12     push ar2
+0005 C003             13     push ar3
+0007 FA               14     MOV R2,A
+0008 540F             15     ANL A,#0Fh
+000A FB               16     MOV R3,A
+000B 940A             17     SUBB A,#0Ah  ;CHECK IF NIBBLE IS DIGIT OR ALPHABET
+                      18     
+000D 5007             19     JNC ALPHA
+                      20     
+000F EB               21     MOV A,R3
+0010 2430             22     ADD A,#30h   ;ADD 30H TO CONV HEX TO ASCII
+0012 F5F0             23     MOV B,A
+0014 8005             24     JMP NEXT
+                      25     
+0016 EB               26     ALPHA: MOV A,R3  ;ADD 37H TO CONVERT ALPHABET TO ASCII
+0017 2437             27     ADD A,#37h
+0019 F5F0             28     MOV B,A
+                      29     
+001B EA               30     NEXT:MOV A,R2
+001C 54F0             31     ANL A,#0F0h          ;CHECK HIGHER NIBBLE IS DIGIT OR ALPHABET
+001E C4               32     SWAP A
+001F FB               33     MOV R3,A
+0020 940A             34     SUBB A,#0Ah
+0022 5008             35     JNC ALPHA2 
+                      36     
+0024 EB               37     MOV A,R3                        ;DIGIT TO ASCII
+0025 2430             38     ADD A,#30h
+0027 D003             39     pop ar3
+0029 D002             40     pop ar2
+002B 22               41     RET
+                      42     
+002C EB               43     ALPHA2:MOV A,R3
+002D 2437             44     ADD A,#37h          ;ALPHABET TO ASCII
+002F D003             45     pop ar3
+0031 D002             46     pop ar2
+0033 22               47     RET     
+                      48     
+                      49     
+                      50     
+0034                  51     switchcheck:
+0034 75900F           52          mov P1,#0FH      ;Select DIP switches
+0037 E590             53          mov A,P1        
+0039 540F             54          anl A,#0FH       ;mask LED bits
+003B C4               55          swap A           ;Taking lower nibble as location value
+003C C0E0             56              push acc         ;for further use
+003E C0E0             57              push acc         ;for further use
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     2
+
+0040 75900F           58              mov P1,#0FH      ;turn off LEDs
+0043 1201AA           59              lcall delay5
+0046 75900F           60          mov P1,#0FH      ;select DIP switches
+0049 E590             61              mov a,P1
+004B 540F             62              anl a,#0FH
+004D C4               63              swap a
+004E D001             64              pop ar1          ;store initial value of a in r1 
+0050 C3               65              clr c
+0051 99               66              subb a,r1        ;compare if current and initial value are same
+0052 B40003           67              cjne a,#00H,do   ;else repeat procedure
+0055 D0E0             68              pop acc          ;value is correct, store this value in acc
+0057 22               69              ret
+0058                  70              do:
+0058 D0E0             71               pop acc
+005A 80D8             72               sjmp switchcheck
+                      73     
+                      74     
+005C                  75     start:
+                      76           using 0
+005C C001             77               push ar1
+005E C002             78               push ar2
+0060 C0E0             79           push acc    
+0062 75A000           80               mov P2,#00h
+0065 759000           81               mov P1,#00h
+                      82               ;initial delay for lcd power up
+                      83     
+                      84     ;here1:setb p1.0
+0068 3199             85           acall delay
+                      86     ;         clr p1.0
+006A 3199             87               acall delay
+                      88     ;         sjmp here1
+                      89     
+                      90     
+006C 313C             91               acall lcd_init      ;initialise LCD
+                      92             
+006E 3199             93               acall delay
+0070 3199             94               acall delay
+0072 3199             95               acall delay
+                      96               
+0074 F8               97               mov r0,a                 ;r1 stores the memory location
+0075 7A00             98               mov r2,#00H
+                      99               
+                     100       
+0077                 101     upper:                    ;subroutine for writing in upper line
+0077 7C08            102         mov r4,#08H
+0079 75F081          103             mov b,#81H
+007C                 104     dou:                
+007C E8              105         mov a,r0
+007D C3              106         clr c
+007E 9480            107             subb a,#80H
+0080 5480            108             anl a,#80H
+0082 B4002A          109             cjne a,#00H,directu
+0085                 110             indirectu:        ;if mem. location is in upper RAM
+0085 E5F0            111               mov a,b         ;b stores cursor posn
+0087 C0F0            112               push b          ;value of b is modified, but requires to be used later
+0089 120179          113               lcall lcd_command     ; move cursor
+008C C060            114               push 60H              ;save value of 60H
+008E 8860            115               mov 60H,r0            ; Note : r0 stores the memory location
+0090 A960            116               mov r1,60H            ; r1 stores value of 60H (i.e memory location)
+0092 E7              117               mov a,@r1              ;60H is guaranteed to be in lower RAM
+0093 D060            118               pop 60H
+0095 120003          119               lcall asciiconv
+0098 120188          120               lcall lcd_senddata     ;send ascii msn to LCD
+009B E5F0            121               mov a,b
+009D 120188          122               lcall lcd_senddata     ;send ascii lsn to LCD
+00A0 08              123               inc r0 
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     3
+
+00A1 1C              124               dec r4                 ;next iteration
+00A2 D0F0            125               pop b                  ;restore cursor position
+00A4 E5F0            126               mov a,b                
+00A6 2402            127               add a,#02              ;increment cursor position by 2
+00A8 F5F0            128               mov b,a
+00AA DCD0            129               djnz r4,dou            ; repeat if not done
+                     130               ;lcall delay5
+00AC 0200D1          131               ljmp lower             ; if done, start writing in lower line
+                     132             
+00AF                 133             directu:          ;if memory location is in lower RAM
+00AF E5F0            134               mov a,b         ;b stores cursor posn
+00B1 C0F0            135               push b
+00B3 120179          136               lcall lcd_command
+00B6 E6              137               mov a,@r0
+00B7 120003          138               lcall asciiconv
+00BA 120188          139               lcall lcd_senddata
+00BD E5F0            140               mov a,b
+00BF 120188          141               lcall lcd_senddata
+00C2 08              142               inc r0
+00C3 1C              143               dec r4
+00C4 D0F0            144               pop b
+00C6 E5F0            145               mov a,b
+00C8 2402            146               add a,#02
+00CA F5F0            147               mov b,a
+00CC DCAE            148               djnz r4,dou
+                     149               ;lcall delay5
+00CE 0200D1          150               ljmp lower         ; if done, start writing in lower line
+                     151     
+00D1                 152     lower:                    ;subroutine for writing in lower line
+00D1 7C08            153         mov r4,#08H
+00D3 75F0C1          154         mov b,#0C1H
+00D6                 155     dol:
+00D6 E8              156         mov a,r0
+00D7 C3              157         clr c
+00D8 9480            158             subb a,#80H
+00DA 5480            159             anl a,#80H
+00DC B4002B          160             cjne a,#00H,directl
+00DF                 161             indirectl:        ;if memory location is in upper RAM
+00DF E5F0            162               mov a,b         ;b stores cursor posn
+00E1 C0F0            163               push b
+00E3 120179          164               lcall lcd_command
+00E6 C060            165               PUSH 60H          ;save value of 60H
+00E8 8860            166               mov 60H,r0        ; Note : r0 stores the memory location
+00EA A960            167               mov r1,60H        ; 60H is guaranteed to be in lower RAM    
+00EC E7              168               mov a,@r1             
+00ED D060            169               POP 60H
+00EF 120003          170               lcall asciiconv   ;return the ascii value defined by nibbles
+00F2 120188          171               lcall lcd_senddata ;write first nibble (msn)
+00F5 E5F0            172               mov a,b
+00F7 120188          173               lcall lcd_senddata  ;write second nibble (lsn)
+00FA 08              174               inc r0
+00FB 1C              175               dec r4
+00FC D0F0            176               pop b
+00FE E5F0            177               mov a,b
+0100 2402            178               add a,#02
+0102 F5F0            179               mov b,a
+0104 DCD0            180               djnz r4,dol        ;if not done, repeat the lower writing procedure
+0106 0A              181               inc r2
+0107 02012F          182               ljmp nextit
+                     183             
+010A                 184             directl:          ;if memory location is in lower RAM
+010A E5F0            185               mov a,b         ;b stores cursor posn
+010C C0F0            186               push b
+010E 120179          187               lcall lcd_command         ;move cursor
+0111 E6              188               mov a,@r0
+0112 120003          189               lcall asciiconv
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     4
+
+0115 120188          190               lcall lcd_senddata
+0118 E5F0            191               mov a,b
+011A 120188          192               lcall lcd_senddata        ;Redundant
+011D 08              193               inc r0                    ;Check the comments
+011E 1C              194               dec r4                    ;in directu (only value of B varies)
+011F D0F0            195               pop b
+0121 E5F0            196               mov a,b
+0123 2402            197               add a,#02
+0125 F5F0            198               mov b,a
+0127 DCAD            199               djnz r4,dol
+0129 0A              200               inc r2
+012A 02012F          201               ljmp nextit
+                     202     
+012D 0177            203     toupper: jmp upper      ;repeat upper again if not done till second screen
+                     204     
+012F                 205     nextit:
+012F 1201AA          206         lcall delay5        
+0132 BA02F8          207         cjne r2,#02H,toupper   ;if not done twice, repeat upper (although with diff. r0)
+0135 D0E0            208             pop acc
+0137 D002            209             pop ar2
+0139 D001            210             pop ar1
+013B 22              211             RET
+                     212     
+                     213     
+                     214     ;------------------------LCD Initialisation routine----------------------------------------
+                             ------------
+013C                 215     lcd_init:
+013C 75A038          216              mov   LCD_data,#38H  ;Function set: 2 Line, 8-bit, 5x7 dots
+013F C280            217              clr   LCD_rs         ;Selected command register
+0141 C281            218              clr   LCD_rw         ;We are writing in instruction register
+0143 D282            219              setb  LCD_en         ;Enable H->L
+0145 3199            220                      acall delay
+0147 C282            221              clr   LCD_en
+0149 3199            222                  acall delay
+                     223     
+014B 75A00C          224              mov   LCD_data,#0CH  ;Display on, Curson off
+014E C280            225              clr   LCD_rs         ;Selected instruction register
+0150 C281            226              clr   LCD_rw         ;We are writing in instruction register
+0152 D282            227              setb  LCD_en         ;Enable H->L
+0154 3199            228                      acall delay
+0156 C282            229              clr   LCD_en
+                     230              
+0158 3199            231                      acall delay
+015A 75A001          232              mov   LCD_data,#01H  ;Clear LCD
+015D C280            233              clr   LCD_rs         ;Selected command register
+015F C281            234              clr   LCD_rw         ;We are writing in instruction register
+0161 D282            235              setb  LCD_en         ;Enable H->L
+0163 3199            236                      acall delay
+0165 C282            237              clr   LCD_en
+                     238              
+0167 3199            239                      acall delay
+                     240     
+0169 75A006          241              mov   LCD_data,#06H  ;Entry mode, auto increment with no shift
+016C C280            242              clr   LCD_rs         ;Selected command register
+016E C281            243              clr   LCD_rw         ;We are writing in instruction register
+0170 D282            244              setb  LCD_en         ;Enable H->L
+0172 3199            245                      acall delay
+0174 C282            246              clr   LCD_en
+                     247     
+0176 3199            248                      acall delay
+                     249              
+0178 22              250              ret                  ;Return from routine
+                     251     
+                     252     ;-----------------------command sending routine-------------------------------------
+0179                 253      lcd_command:
+0179 F5A0            254              mov   LCD_data,A     ;Move the command to LCD port
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     5
+
+017B C280            255              clr   LCD_rs         ;Selected command register
+017D C281            256              clr   LCD_rw         ;We are writing in instruction register
+017F D282            257              setb  LCD_en         ;Enable H->L
+0181 3199            258                      acall delay
+0183 C282            259              clr   LCD_en
+0185 3199            260                      acall delay
+                     261         
+0187 22              262              ret  
+                     263     ;-----------------------data sending routine-------------------------------------          
+                                       
+0188                 264      lcd_senddata:
+                     265              
+0188 F5A0            266              mov   LCD_data,A     ;Move the command to LCD port
+018A D280            267              setb  LCD_rs         ;Selected data register
+018C C281            268              clr   LCD_rw         ;We are writing
+018E D282            269              setb  LCD_en         ;Enable H->L
+0190 3199            270                      acall delay
+0192 C282            271              clr   LCD_en
+0194 3199            272              acall delay
+0196 3199            273                      acall delay
+                     274                     
+0198 22              275              ret                  ;Return from busy routine
+                     276     
+                     277     ;----------------------delay routine-----------------------------------------------------
+0199 C003            278     delay:   push ar3
+019B C004            279              push ar4
+                     280                      ;push acc
+019D 7B01            281              mov r3,#1
+019F 7CFF            282     loop2:   mov r4,#255
+01A1 DCFE            283     loop1:   djnz r4, loop1
+01A3 DBFA            284                      djnz r3,loop2
+                     285                     ; pop acc
+01A5 D004            286                      pop ar4
+01A7 D003            287                      pop ar3
+01A9 22              288                      ret
+                     289     ;---------------------5secdelay------------------------------------------------------------
+01AA                 290     delay5:
+                     291           ;push ar3
+                     292               ;push ar4
+01AA 7B64            293           mov r3,#100
+01AC                 294               looper1:
+01AC 7CC8            295               mov r4,#200
+01AE                 296               looper2:
+01AE 3199            297               acall delay
+01B0 DCFC            298               djnz r4,looper2
+01B2 DBF8            299               djnz r3,looper1
+                     300               ;pop ar4
+                     301               ;pop ar3
+01B4 22              302               ret
+                     303     ;------------------------------------------------------------------------------------------
+                             --     
+                     304                
+                     305     
+01B5                 306     main:
+01B5 7590A0          307       mov P1,#10100000B        ;Indicator that LED is accepting values(input mem. location valu
+                             e)
+01B8 1201AA          308       lcall delay5             ;Delay for writing value
+                     309       
+01BB 7890            310       mov r0,#90H              ;Store values 1 to 16 starting from location specified
+01BD 7910            311       mov r1,#16
+01BF 7401            312       mov a,#1
+01C1                 313       loop:
+01C1 F6              314         mov @r0,a
+01C2 08              315         inc r0
+01C3 04              316         inc a
+01C4 D9FB            317         djnz r1,loop
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     6
+
+                     318      
+01C6 120034          319       lcall switchcheck        ;Acc stores values of memory location
+01C9 12005C          320       lcall start              ;Start display process
+01CC 80E7            321       here: sjmp main          ;Repeat the full procedure again
+                     322       
+                     323       ;Flow of Command: 
+                     324       ; main -> switchcheck -> start -> upper -> lower -> nextit -> (repeat)  
+                     325     END
+A51 MACRO ASSEMBLER  LAB4_LW                                                              08/18/2015 16:43:50 PAGE     7
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+ALPHA. . . . . . .  C ADDR   0016H   A   
+ALPHA2 . . . . . .  C ADDR   002CH   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+ASCIICONV. . . . .  C ADDR   0003H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+DELAY. . . . . . .  C ADDR   0199H   A   
+DELAY5 . . . . . .  C ADDR   01AAH   A   
+DIRECTL. . . . . .  C ADDR   010AH   A   
+DIRECTU. . . . . .  C ADDR   00AFH   A   
+DO . . . . . . . .  C ADDR   0058H   A   
+DOL. . . . . . . .  C ADDR   00D6H   A   
+DOU. . . . . . . .  C ADDR   007CH   A   
+HERE . . . . . . .  C ADDR   01CCH   A   
+INDIRECTL. . . . .  C ADDR   00DFH   A   
+INDIRECTU. . . . .  C ADDR   0085H   A   
+LCD_COMMAND. . . .  C ADDR   0179H   A   
+LCD_DATA . . . . .  D ADDR   00A0H   A   
+LCD_EN . . . . . .  B ADDR   0080H.2 A   
+LCD_INIT . . . . .  C ADDR   013CH   A   
+LCD_RS . . . . . .  B ADDR   0080H.0 A   
+LCD_RW . . . . . .  B ADDR   0080H.1 A   
+LCD_SENDDATA . . .  C ADDR   0188H   A   
+LOOP . . . . . . .  C ADDR   01C1H   A   
+LOOP1. . . . . . .  C ADDR   01A1H   A   
+LOOP2. . . . . . .  C ADDR   019FH   A   
+LOOPER1. . . . . .  C ADDR   01ACH   A   
+LOOPER2. . . . . .  C ADDR   01AEH   A   
+LOWER. . . . . . .  C ADDR   00D1H   A   
+MAIN . . . . . . .  C ADDR   01B5H   A   
+NEXT . . . . . . .  C ADDR   001BH   A   
+NEXTIT . . . . . .  C ADDR   012FH   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+START. . . . . . .  C ADDR   005CH   A   
+SWITCHCHECK. . . .  C ADDR   0034H   A   
+TOUPPER. . . . . .  C ADDR   012DH   A   
+UPPER. . . . . . .  C ADDR   0077H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

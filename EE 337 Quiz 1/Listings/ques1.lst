@@ -1,0 +1,151 @@
+A51 MACRO ASSEMBLER  QUES1                                                                08/22/2015 12:31:27 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\ques1.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE ques1.asm SET(SMALL) DEBUG PRINT(.\Listings\ques1.lst) OBJECT(.\Objects
+                      \ques1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 000h
+0000 020088            2     ljmp main
+                       3     
+                       4     ;Assuming given array is A[0],A[1],...,A[4]
+                       5     
+0003                   6     findSmallest:
+                       7     using 0
+0003 C0E0              8     push acc
+0005 C0F0              9     push b                ;For the second smallest number
+0007 C000             10     push ar0              ;Used for traversal
+0009 C001             11     push ar1              ;For the storing the smallest number
+000B C002             12     push ar2              ;Variable for counting
+000D C060             13     push 60H              ;Store location to which the smallest number is pointing
+000F A950             14     mov r1,50H            ;Take the starting location as the smallest number
+0011 756050           15     mov 60H,#50H          ;As smallest number is chosen to be at 50H
+0014 8550F0           16     mov b,50H             ;Take the starting location as the second smallest number
+0017 7A04             17     mov r2,#04            ;As location 50H is already stored, we need to compare only 4 nos. 
+0019 7851             18     mov r0,#51H           ;r0 would be used to traverse the array
+001B                  19     loop:
+001B E6               20       mov a,@r0
+001C 120052           21       lcall compare1          ;compare1 will modify the value of r1 accordingly
+001F 120068           22       lcall compare2          ;comapre2 will modify the value of r2 accordingly
+0022 08               23       inc r0                  ;point to next memory location
+0023 DAF6             24       djnz r2,loop
+                      25     ;push acc
+0025 E560             26     mov a,60H
+0027 C3               27     clr c
+0028 9450             28     subb a,#50H
+002A 6012             29     jz do1               
+002C 8955             30     mov 55H,r1                ;Register r1 now stores the smallest number  
+002E 85F056           31     mov 56H,b                 ;Register B stores the second smallest number 
+0031 D060             32     pop 60H        
+0033 D002             33     pop ar2
+0035 D001             34     pop ar1
+0037 D000             35     pop ar0
+0039 D0F0             36     pop b
+003B D0E0             37     pop acc
+003D 22               38     ret
+003E                  39     do1:
+003E C001             40     push ar1
+0040 8955             41     mov 55H,r1 
+0042 85F056           42     mov 56H,b
+0045 D060             43     pop 60H        
+0047 D002             44     pop ar2
+0049 D001             45     pop ar1
+004B D000             46     pop ar0
+004D D0F0             47     pop b
+004F D0E0             48     pop acc
+0051 22               49     ret
+                      50     
+0052                  51     compare1:              ;Subroutine to compare nos. in registers A and R1, store smaller in 
+                             R1
+0052 C3               52       clr c
+0053 C0F0             53       push b
+0055 89F0             54       mov b,r1
+0057 B5F003           55       cjne a,b,check1      ;if they are not equal, check which one is greater
+005A D0F0             56       pop b
+A51 MACRO ASSEMBLER  QUES1                                                                08/22/2015 12:31:27 PAGE     2
+
+005C 22               57       ret
+005D                  58       check1:
+005D 4003             59         jc newsmall1       ;if carry is set, i.e r1>a, r1 should be modified
+005F D0F0             60             pop b
+0061 22               61             ret                ;reached if r1 already stores the smaller number
+0062                  62             newsmall1:
+0062 F9               63               mov r1,a         ;New smallest number found
+0063 8860             64               mov 60H,r0       ;Change location of smallest number
+0065 D0F0             65               pop b
+0067 22               66               ret
+                      67     
+0068                  68     compare2:              ;Subroutine to find the second smallest number at each step
+0068 C3               69        clr c
+0069 B5F001           70        cjne a,b,check2     ;if they are not equal, check which one is greater
+006C 22               71        ret
+006D                  72        check2:
+006D 4001             73          jc check21        ;if carry is set, i.e b>a , b may have to be modified
+006F 22               74              ret
+0070                  75          check21:
+0070 C3               76                clr c
+0071 C0E0             77                push acc
+0073 C0F0             78                push b
+0075 E8               79                mov a,r0        ;Store values of R0 in A and 60H in B (for CJNE to work)
+0076 8560F0           80                mov b,60h
+0079 B5F005           81                cjne a,b, changeb  ;If the smallest number is also stored in same location, don'
+                             t modify
+007C D0F0             82                pop b
+007E D0E0             83                pop acc
+0080 22               84                ret
+0081                  85                changeb:          ;Subroutine is called if smallest number is not at this memory
+                              location
+0081 D0F0             86                 pop b            ;Hence, second smallest number is stored here
+0083 D0E0             87             pop acc          
+0085 F5F0             88                 mov b,a          ;New second smallest number found
+0087 22               89                     ret
+                      90                 
+                      91                
+0088                  92     main:
+                      93     ;Assuming we are given five numbers
+0088 755022           94     mov 50h,#34
+008B 755129           95     mov 51h,#41
+008E 755250           96     mov 52h,#80
+0091 755314           97     mov 53h,#20
+0094 755432           98     mov 54h,#50
+0097 120003           99     lcall findSmallest
+                     100     
+009A 80FE            101     stop: sjmp stop
+                     102     
+                     103     end
+                                     
+                                     ; NOTE : an error occurs when the smallest value is the first smallest value itself
+A51 MACRO ASSEMBLER  QUES1                                                                08/22/2015 12:31:27 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CHANGEB. . . . . .  C ADDR   0081H   A   
+CHECK1 . . . . . .  C ADDR   005DH   A   
+CHECK2 . . . . . .  C ADDR   006DH   A   
+CHECK21. . . . . .  C ADDR   0070H   A   
+COMPARE1 . . . . .  C ADDR   0052H   A   
+COMPARE2 . . . . .  C ADDR   0068H   A   
+DO1. . . . . . . .  C ADDR   003EH   A   
+FINDSMALLEST . . .  C ADDR   0003H   A   
+LOOP . . . . . . .  C ADDR   001BH   A   
+MAIN . . . . . . .  C ADDR   0088H   A   
+NEWSMALL1. . . . .  C ADDR   0062H   A   
+STOP . . . . . . .  C ADDR   009AH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

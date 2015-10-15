@@ -1,0 +1,298 @@
+C51 COMPILER V9.54   QUIZ2                                                                 10/10/2015 13:07:07 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE QUIZ2
+OBJECT MODULE PLACED IN .\Objects\quiz2.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE quiz2.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\qui
+                    -z2.lst) TABS(2) OBJECT(.\Objects\quiz2.obj)
+
+line level    source
+
+   1          #include "at89c5131.h"
+   2          #include "stdio.h"
+   3          
+   4          void SPI_Init();
+   5          void Timer_Init();
+   6          void modereq();
+   7          sbit CS_BAR = P2^0;                 // Chip Select for the ADC
+   8          bit transmit_completed= 0;          // To check if spi data transmit is complete
+   9          sbit w0 = P1^0; 
+  10          sbit w1 = P1^1;
+  11          sbit f0 = P1^2;
+  12          sbit f1 = P1^3;
+  13          bit p=0,q=0,r=0,s=0;           //temp bits to take switch values
+  14          bit inv=0;                    //needed for square wave generation
+  15          bit rep=0;
+  16          int tm=0;                     //Selecting the frequency in timer interrupt
+  17          int count=0;
+  18          unsigned char serial_data;
+  19          unsigned char a=0x00;
+  20          unsigned char b=0x00;
+  21           
+  22          void main(void)
+  23          {
+  24   1        P3 = 0X00;                      // Make Port 3 output 
+  25   1        P2 = 0x00;                      // Make Port 2 output 
+  26   1        P1 |= 0x0F;                     // Make P1 Pin 0-3 as input
+  27   1        P0 &= 0xF0;                     // Make Port 0 Pins 0,1,2 output
+  28   1        
+  29   1        SPI_Init();
+  30   1        Timer_Init();
+  31   1        modereq();
+  32   1        
+  33   1        while(1)                        // endless 
+  34   1        { 
+  35   2        
+  36   2          
+  37   2          if(inv==1 && (p==0&&q==0))            //for implementing square wave
+  38   2          {
+  39   3           CS_BAR=0;
+  40   3          
+  41   3           SPDAT=0x70;
+  42   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  43   3           transmit_completed = 0;      // clear software transfert flag
+  44   3          
+  45   3           SPDAT=0x00;
+  46   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  47   3           transmit_completed = 0;      // clear software transfert flag    
+  48   3          
+  49   3           CS_BAR=1;
+  50   3          }
+  51   2          if(inv==0 && (p==0&&q==0))      
+  52   2          {
+  53   3           CS_BAR=0;
+  54   3          
+C51 COMPILER V9.54   QUIZ2                                                                 10/10/2015 13:07:07 PAGE 2   
+
+  55   3           SPDAT=a;
+  56   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  57   3           transmit_completed = 0;      // clear software transfert flag
+  58   3          
+  59   3           SPDAT=b;
+  60   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  61   3           transmit_completed = 0;      // clear software transfert flag    
+  62   3          
+  63   3           CS_BAR=1;
+  64   3          }
+  65   2          
+  66   2          if(p==0&&q==1)                    //For implementing Sawtooth
+  67   2          {
+  68   3              
+  69   3            if (rep==1)                  //To repeat pattern
+  70   3            {b=0xFF;
+  71   4            a=0x7F;
+  72   4            rep =0;
+  73   4            count =0;}
+  74   3            
+  75   3           CS_BAR=0;
+  76   3          
+  77   3           SPDAT=a;
+  78   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  79   3           transmit_completed = 0;      // clear software transfert flag
+  80   3          
+  81   3           SPDAT=b;
+  82   3           while(!transmit_completed);  // wait end of transmition;TILL SPIF = 1 
+  83   3           transmit_completed = 0;      // clear software transfert flag
+  84   3                
+  85   3           if(count>=15000&&count<29000)
+  86   3           {a=0x77;b=0xFF;}
+  87   3           if (count >=29000)
+  88   3           {a=0x70;b=0x00;}
+  89   3           count++;
+  90   3           CS_BAR=1;
+  91   3            
+  92   3          }
+  93   2        }
+  94   1      } 
+  95          
+  96          
+  97          void modereq(void)                //Function to decide which waveform to produce
+  98          { p=w0;
+  99   1        q=w1;
+ 100   1        r=f0;
+ 101   1        s=f1;
+ 102   1        if(p==0&&q==0)               //Square Wave
+ 103   1        { 
+ 104   2          if(r==0&&s==0)            //For deciding frequency
+ 105   2          { tm=0;
+ 106   3            a=0x7F;
+ 107   3            b=0xFF;
+ 108   3          }
+ 109   2          if(r==1&&s==0)
+ 110   2          { tm=1;
+ 111   3            a=0x7F;
+ 112   3            b=0xFF;
+ 113   3          }
+ 114   2          if(r==0&&s==1)
+ 115   2          { tm=2;
+ 116   3            a=0x7F;
+C51 COMPILER V9.54   QUIZ2                                                                 10/10/2015 13:07:07 PAGE 3   
+
+ 117   3            b=0xFF;
+ 118   3          }
+ 119   2          
+ 120   2        }
+ 121   1        else{
+ 122   2        if(p==1&&q==0)                        //Triangular Wave
+ 123   2        { inv=0;
+ 124   3          if(r==0&&s==0)
+ 125   3          { tm=0;
+ 126   4            a=0x7F;
+ 127   4            b=0xFF;
+ 128   4          }
+ 129   3          if(r==1&&s==0)
+ 130   3          { tm=1;
+ 131   4            a=0x7F;
+ 132   4            b=0xFF;
+ 133   4          }
+ 134   3          if(r==0&&s==1)
+ 135   3          { tm=2;
+ 136   4            a=0x7F;
+ 137   4            b=0xFF;
+ 138   4          }
+ 139   3          
+ 140   3        }
+ 141   2        else{
+ 142   3        if(p==0&&q==1)                          //Sawtooth wave
+ 143   3        { inv=0;
+ 144   4          rep=1;
+ 145   4          if(r==0&&s==0)
+ 146   4          { tm=0;
+ 147   5            a=0x7F;
+ 148   5            b=0xFF;
+ 149   5          }
+ 150   4          if(r==1&&s==0)
+ 151   4          { tm=1;
+ 152   5            a=0x7F;
+ 153   5            b=0xFF;
+ 154   5          }
+ 155   4          if(r==0&&s==1)
+ 156   4          { tm=2;
+ 157   5            a=0x7F;
+ 158   5            b=0xFF;
+ 159   5          }
+ 160   4          
+ 161   4        }
+ 162   3        if(p==1&&q==1)                              //DC Value
+ 163   3        { inv=0;
+ 164   4          a=0x7F;
+ 165   4          b=0xFF;
+ 166   4        }
+ 167   3      } 
+ 168   2        }
+ 169   1      }
+ 170          
+ 171          
+ 172          
+ 173          
+ 174          
+ 175          void it_SPI(void) interrupt 9 /* interrupt address is 0x004B */
+ 176          {
+ 177   1        switch  ( SPSTA )         /* read and clear spi status register */
+ 178   1        {
+C51 COMPILER V9.54   QUIZ2                                                                 10/10/2015 13:07:07 PAGE 4   
+
+ 179   2          case 0x80:  
+ 180   2            serial_data=SPDAT;   /* read receive data */
+ 181   2            transmit_completed=1;/* set software flag */
+ 182   2          break;
+ 183   2      
+ 184   2          case 0x10:
+ 185   2               /* put here for mode fault tasking */  
+ 186   2          break;
+ 187   2        
+ 188   2          case 0x40:
+ 189   2               /* put here for overrun tasking */ 
+ 190   2          break;
+ 191   2        }
+ 192   1      }
+ 193          
+ 194          
+ 195          
+ 196          void SPI_Init()
+ 197          {
+ 198   1        CS_BAR = 1;                     // DISABLE ADC SLAVE SELECT-CS 
+ 199   1        SPCON |= 0x20;                  // P1.1(SSBAR) is available as standard I/O pin 
+ 200   1        SPCON |= 0x01;                  // Fclk Periph/4 AND Fclk Periph=12MHz ,HENCE SCK IE. BAUD RATE=3000KHz 
+ 201   1        SPCON |= 0x10;                  // Master mode 
+ 202   1        SPCON |= 0x08;                  // CPOL=1; transmit mode example|| SCK is 0 at idle state
+ 203   1        SPCON |= 0x04;                  // CPHA=1; transmit mode example 
+ 204   1        IEN1 |= 0x04;                   // enable spi interrupt 
+ 205   1        EA=1;                           // enable interrupts 
+ 206   1        SPCON |= 0x40;                  // run spi;ENABLE SPI INTERFACE SPEN= 1 
+ 207   1      }
+ 208          
+ 209          
+ 210          void Timer_Init()
+ 211          {
+ 212   1        // Set Timer0 to work in up counting 16 bit mode. Counts upto 
+ 213   1        // 65536 depending upon the calues of TH0 and TL0
+ 214   1        // The timer counts 65536 processor cycles. A processor cycle is 
+ 215   1        // 12 clocks. FOr 24 MHz, it takes 65536/2 uS to overflow
+ 216   1        // By setting TH0TL0 to 3CB0H, the timer overflows every 25 ms
+ 217   1        
+ 218   1        TH0 = 0xB1;                     //For 25ms operation
+ 219   1        TL0 = 0xE0;
+ 220   1        TMOD = (TMOD & 0xF0) | 0x01;    // Set T/C0 Mode 
+ 221   1        ET0 = 1;                        // Enable Timer 0 Interrupts 
+ 222   1        TR0 = 1;                        // Start Timer 0 Running 
+ 223   1      }
+ 224          
+ 225          
+ 226          void timer0_ISR (void) interrupt 1
+ 227          {
+ 228   1        if(p==0&&q==0)      //To invert values for square
+ 229   1        {inv=~inv;
+ 230   2        if(tm==0)          //100Hz
+ 231   2        { 
+ 232   3        TH0 = 0xD8;                     
+ 233   3        TL0 = 0xF0;
+ 234   3        }
+ 235   2        if(tm==1)         //200Hz
+ 236   2        {
+ 237   3        TH0 = 0xEC;                     
+ 238   3        TL0 = 0x78;
+ 239   3        }
+ 240   2        if(tm==2)         //500Hz
+C51 COMPILER V9.54   QUIZ2                                                                 10/10/2015 13:07:07 PAGE 5   
+
+ 241   2        {
+ 242   3        TH0 = 0xF8;                     
+ 243   3        TL0 = 0x30;
+ 244   3        }
+ 245   2        }
+ 246   1          
+ 247   1        if(p==0&&q==1)      //For Sawtooth
+ 248   1        {rep=1;
+ 249   2        
+ 250   2        if(tm==0)          //100Hz
+ 251   2        { 
+ 252   3        TH0 = 0xB1;                     
+ 253   3        TL0 = 0xE0;
+ 254   3        }
+ 255   2        if(tm==1)         //200Hz
+ 256   2        {
+ 257   3        TH0 = 0xD8;                     
+ 258   3        TL0 = 0xF0;
+ 259   3        }
+ 260   2        if(tm==2)         //500Hz
+ 261   2        {
+ 262   3        TH0 = 0xF0;                     
+ 263   3        TL0 = 0x60;
+ 264   3        }
+ 265   2        }
+ 266   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    561    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      7    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      7    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

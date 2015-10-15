@@ -1,0 +1,86 @@
+A51 MACRO ASSEMBLER  16BITSUB                                                             07/29/2015 16:59:42 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\16bitsub.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE Labwork\16bitsub.asm SET(SMALL) DEBUG PRINT(.\Listings\16bitsub.lst) OB
+                      JECT(.\Objects\16bitsub.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0000H
+0000 020122            2     LJMP MAIN
+                       3     
+                       4     ;R0 and R1 should contain the address of two no.s
+                       5     ;location given by R0:-         MSB of 1st no.
+                       6     ;location given by R0+1:-       LSB of 1st no.
+                       7     ;location given by R1:-         MSB of 1st no.
+                       8     ;location given by R1+1:-       LSB of 1st no.
+                       9     ;location given by R0+2:-       CARRY   
+                      10     ;location given by R0+3:-       MSB OF ANS      
+                      11     ;location given by R0+4:-       LSB OF ANS
+                      12     
+                      13     ;---------------------------------------------------------;
+                      14     ;this function adds and stores result in appropriate location
+0100                  15     ORG 0100H
+                      16     
+0100                  17     ADDER_16BIT:
+0100 C3               18         CLR C
+0101 E561             19             MOV A,61H
+0103 9571             20             SUBB A,71H
+0105 F564             21             MOV 64H,A  ;Store Result LSB
+0107 E560             22             MOV A,60H
+0109 9570             23             SUBB A,70H
+010B F563             24             MOV 63H,A
+010D 20D201           25             JB PSW.2,RETURN
+0110 22               26             RET
+                      27         
+                      28             ;-- perform the addition/subtraction of 2 16-bit no.s
+                      29             ;-- you may use subroutine wrtten for addition of 2 8-bit no.s
+                      30             ;-- remember the no.s are given in 2's complement form
+                      31             
+                      32             
+                      33             ;-- take care when you set carry/borrow.
+                      34             
+                      35             ;-- store the result at appropriate locations.
+                      36             
+0111                  37             RETURN: 
+0111 756201           38             MOV 62H,#01H ;-- pop the registers
+0114 22               39             RET
+                      40     
+0115                  41     INIT:
+                      42             ;-- store the numbers to be added/subtracted at appropriate location
+0115 75607F           43             MOV 60H,#7FH    ;MSB of N1
+0118 756100           44             MOV 61H,#00H    ;LSB of N1
+011B 7570FF           45             MOV 70H,#0FFH    ;MSB of N2
+011E 7571FF           46             MOV 71H,#0FFH    ;LSB of N2
+0121 22               47             RET
+                      48     
+                      49     
+                      50     
+0122                  51     MAIN:
+0122 3115             52             ACALL INIT
+0124 3100             53             ACALL ADDER_16BIT
+                      54     
+                      55     END
+                             
+                             
+A51 MACRO ASSEMBLER  16BITSUB                                                             07/29/2015 16:59:42 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ADDER_16BIT. . . .  C ADDR   0100H   A   
+INIT . . . . . . .  C ADDR   0115H   A   
+MAIN . . . . . . .  C ADDR   0122H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   0111H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

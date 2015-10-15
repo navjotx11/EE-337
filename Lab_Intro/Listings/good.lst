@@ -1,0 +1,79 @@
+A51 MACRO ASSEMBLER  GOOD                                                                 07/27/2015 19:58:52 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\good.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE ..\good.asm SET(SMALL) DEBUG PRINT(.\Listings\good.lst) OBJECT(.\Object
+                      s\good.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;---------------------------------------------------------------
+                       2     ;TITLE: GOOD CODING STYLES TO BLINK LEDs
+                       3     ;AUTHOR : ZEAL SHETH (WADHWANI ELECTRONICS LAB)
+                       4     ;---------------------------------------------------------------
+                       5     
+  0080                 6             LED EQU P0
+                       7     
+0000                   8             ORG 00H
+0000 020100            9             LJMP MAIN
+                      10     
+                      11     
+                      12     ;----------------------------------------------------------------
+0050                  13             ORG 50H
+                      14     
+0050                  15     DELAY:
+                      16             USING 0 ;ASSEMBLER DIRECTIVE TO INDICATE REGISTER BANK0
+0050 C0D0             17             PUSH PSW
+0052 C001             18             PUSH AR1; STORE R1 (BANK O) ON THE STACK
+0054 C002             19             PUSH AR2
+                      20     
+0056 79FF             21             MOV R1, #0FFH
+0058 7AFF             22             MOV R2, #0FFH
+005A                  23          DELAY1:
+005A 00               24             NOP
+005B D9FD             25             DJNZ R1, DELAY1
+005D DAFB             26             DJNZ R2, DELAY1
+                      27     
+005F D002             28             POP AR2 ; POP MUST BE IN REVERSE ORDER OF PUSH
+0061 D001             29             POP AR1
+0063 D0D0             30             POP PSW
+0065 22               31     RET
+                      32     
+                      33     ;----------------------------------------------------------------------
+0100                  34     ORG 100H
+0100                  35     MAIN:
+0100 758000           36                     MOV LED,#00H            ;MAKE P0 OUTPUT PORT
+0103 7455             37                     MOV A,#55H          ;01010101B
+0105 F580             38             BACK:MOV LED,A
+0107 120050           39                     LCALL DELAY
+010A F4               40                     CPL A                           ;10101010B
+010B 80F8             41                     SJMP BACK
+                      42     
+010D 80FE             43     FIN:    SJMP    FIN             ;ALL DONE.
+                      44     ;--------------------------------------------------------------------------
+*** WARNING #A41 IN 44 (..\good.asm, LINE 44): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  GOOD                                                                 07/27/2015 19:58:52 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+BACK . . . . . . .  C ADDR   0105H   A   
+DELAY. . . . . . .  C ADDR   0050H   A   
+DELAY1 . . . . . .  C ADDR   005AH   A   
+FIN. . . . . . . .  C ADDR   010DH   A   
+LED. . . . . . . .  D ADDR   0080H   A   
+MAIN . . . . . . .  C ADDR   0100H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)

@@ -1,0 +1,91 @@
+A51 MACRO ASSEMBLER  LB_LAB2                                                              08/06/2015 23:11:50 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lb_lab2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lb_lab2.asm SET(SMALL) DEBUG PRINT(.\Listings\lb_lab2.lst) OBJECT(.\Obj
+                      ects\lb_lab2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 00H
+0000 02002C            2     LJMP main
+                       3     
+                       4     
+0003                   5     memcpy:
+                       6     USING 0
+0003 C000              7      PUSH AR0
+0005 C001              8      PUSH AR1
+0007 C002              9      PUSH AR2 
+0009 C0E0             10      PUSH ACC
+000B                  11       dopush:                            ;Push all A values
+000B AA50             12        MOV R2,50H
+000D A851             13        MOV R0,51H
+000F E6               14        MOV A,@R0
+0010 2A               15        ADD A,R2
+0011 14               16        DEC A
+0012                  17        loop1:
+0012 F8               18         MOV R0,A
+0013 C000             19         PUSH AR0
+0015 14               20         DEC A
+0016 DAFA             21             DJNZ R2,loop1   
+0018                  22       dopop:                             ;Pop all A values to B
+0018 AA50             23        MOV R2,50H
+001A A852             24        MOV R0,52H
+001C                  25        loop3:
+001C D001             26         POP AR1
+001E E9               27             MOV A,R1
+001F F6               28             MOV @R0,A
+0020 08               29         INC R0
+0021 DAF9             30             DJNZ R2,loop3
+0023 D0E0             31      POP ACC
+0025 D002             32      POP AR2
+0027 D001             33      POP AR1
+0029 D000             34      POP AR0
+002B 22               35      RET
+                      36             
+                      37     
+002C                  38     main:
+                      39       USING 0 
+002C 75500B           40       MOV 50H,#0BH     ;N=11
+002F 755165           41       MOV 51H,#65H
+0032 755260           42       MOV 52H,#60H
+                      43       
+0035 A951             44       MOV R1,51H
+0037 7401             45       MOV A,#01H
+0039 AA50             46       MOV R2,50H
+003B                  47       looper:
+003B F7               48        MOV @R1,A                 ;Can't indirectly store in A? i.e MOV @A,R1 -> ILLEGAL?
+003C 09               49        INC R1
+003D 04               50        INC A
+003E DAFB             51        DJNZ R2,looper
+                      52     
+0040 120003           53       LCALL memcpy
+                      54       
+                      55     END
+                               
+A51 MACRO ASSEMBLER  LB_LAB2                                                              08/06/2015 23:11:50 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+DOPOP. . . . . . .  C ADDR   0018H   A   
+DOPUSH . . . . . .  C ADDR   000BH   A   
+LOOP1. . . . . . .  C ADDR   0012H   A   
+LOOP3. . . . . . .  C ADDR   001CH   A   
+LOOPER . . . . . .  C ADDR   003BH   A   
+MAIN . . . . . . .  C ADDR   002CH   A   
+MEMCPY . . . . . .  C ADDR   0003H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

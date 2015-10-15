@@ -1,0 +1,79 @@
+A51 MACRO ASSEMBLER  1_LED_BLINKING                                                       08/11/2015 14:30:15 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\1_led_blinking.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE 1_led_blinking.asm SET(SMALL) DEBUG PRINT(.\Listings\1_led_blinking.lst
+                      ) OBJECT(.\Objects\1_led_blinking.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 000H
+  0090                 2     LED EQU P1
+0000 020028            3     LJMP main
+                       4     
+                       5     
+0003                   6     delay:                        ;Total Delay Provided is D/2 seconds
+                       7        USING 0                    ;where D is stored in location 4FH
+0003 C004              8        PUSH AR4
+0005 C001              9        PUSH AR1
+0007 C002             10        PUSH AR2
+0009 C003             11        PUSH AR3
+000B C0E0             12        PUSH ACC
+000D AC4F             13        MOV R4,4FH                 ;Or mention this Value inexplicitly
+000F                  14        LOOP:
+000F 7B0A             15        MOV R3,#10                 ;Module Provides delay of 0.5 sec
+0011                  16        BACK2:
+0011 7AC8             17         MOV R2,#200
+0013                  18         BACK1:
+0013 79FF             19          MOV R1,#0FFH
+0015                  20           BACK:
+0015 D9FE             21            DJNZ R1, BACK
+0017 DAFA             22            DJNZ R2, BACK1
+0019 DBF6             23            DJNZ R3, BACK2
+001B DCF2             24            DJNZ R4, LOOP
+001D D0E0             25        POP ACC
+001F D003             26        POP AR3
+0021 D002             27        POP AR2
+0023 D001             28        POP AR1
+0025 D004             29        POP AR4
+0027 22               30        RET 
+                      31       
+                      32     
+0028                  33     main: 
+                      34      
+0028 754F02           35       MOV 4FH,#02H               ;Store Value of D
+002B D294             36       SETB LED.4
+002D 120003           37       InfDelay: LCALL delay     ;This is used to check LED "blinking"
+0030 B294             38               CPL LED.4
+0032 80F9             39               SJMP InfDelay
+                      40                       
+                      41     END
+A51 MACRO ASSEMBLER  1_LED_BLINKING                                                       08/11/2015 14:30:15 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+BACK . . . . . . .  C ADDR   0015H   A   
+BACK1. . . . . . .  C ADDR   0013H   A   
+BACK2. . . . . . .  C ADDR   0011H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+INFDELAY . . . . .  C ADDR   002DH   A   
+LED. . . . . . . .  D ADDR   0090H   A   
+LOOP . . . . . . .  C ADDR   000FH   A   
+MAIN . . . . . . .  C ADDR   0028H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

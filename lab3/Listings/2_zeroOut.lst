@@ -1,0 +1,65 @@
+A51 MACRO ASSEMBLER  2_ZEROOUT                                                            08/07/2015 19:02:52 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\2_zeroOut.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE 2_zeroOut.asm SET(SMALL) DEBUG PRINT(.\Listings\2_zeroOut.lst) OBJECT(.
+                      \Objects\2_zeroOut.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 000H
+0000 020025            2     LJMP main
+                       3     
+0003                   4     zeroOut:
+                       5        USING 0
+0003 C0E0              6        PUSH ACC
+0005 C000              7        PUSH AR0
+0007 C001              8        PUSH AR1
+0009 E590              9        MOV A,P1
+000B 540F             10        ANL A, #0FH
+000D C0E0             11        PUSH ACC
+000F F8               12        MOV R0,A
+0010 A951             13        MOV R1,51H
+0012 7401             14        MOV A,#01H
+0014                  15        dozero:
+0014 04               16          INC A
+0015 F7               17              MOV @R1,A
+0016 09               18              INC R1
+0017 D8FB             19              DJNZ R0,dozero
+0019 D0E0             20          POP ACC
+001B D001             21        POP AR1   
+001D C4               22        SWAP A
+001E F590             23        MOV P1,A
+0020 D000             24        POP AR0   
+0022 D0E0             25        POP ACC
+0024 22               26        RET
+                      27       
+0025                  28     main:
+0025 75900F           29         MOV P1,#0FH
+0028 755160           30             MOV 51H,#60H
+002B 756101           31             MOV 61H,#01H
+002E 120003           32             LCALL zeroOut
+                      33             
+                      34     END
+A51 MACRO ASSEMBLER  2_ZEROOUT                                                            08/07/2015 19:02:52 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+DOZERO . . . . . .  C ADDR   0014H   A   
+MAIN . . . . . . .  C ADDR   0025H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+ZEROOUT. . . . . .  C ADDR   0003H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

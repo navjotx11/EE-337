@@ -1,0 +1,269 @@
+A51 MACRO ASSEMBLER  LAB3_2                                                               08/11/2015 17:19:42 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab3_2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE lab3_2.asm SET(SMALL) DEBUG PRINT(.\Listings\lab3_2.lst) OBJECT(.\Objec
+                      ts\lab3_2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; Program for readNibble and display on LED
+                       2     
+0000                   3     ORG 000H
+0000 020125            4     LJMP main
+                       5     
+0003                   6     delay:                        ;Total Delay Provided is D/2 seconds
+                       7        USING 0                    ;where D is stored in location 4FH
+0003 C004              8        PUSH AR4
+0005 C001              9        PUSH AR1
+0007 C002             10        PUSH AR2
+0009 C003             11        PUSH AR3
+000B C0E0             12        PUSH ACC
+000D AC4F             13        MOV R4,4FH                 
+000F                  14        LOOP:
+000F 7B0A             15        MOV R3,#10                 
+0011                  16        BACK2:                             ;Module Provides delay of 0.5 sec
+0011 7AC8             17         MOV R2,#200
+0013                  18         BACK1:
+0013 79FF             19          MOV R1,#0FFH
+0015                  20           BACK:
+0015 D9FE             21            DJNZ R1, BACK
+0017 DAFA             22            DJNZ R2, BACK1
+0019 DBF6             23            DJNZ R3, BACK2
+001B DCF2             24            DJNZ R4, LOOP
+001D D0E0             25        POP ACC
+001F D003             26        POP AR3
+0021 D002             27        POP AR2
+0023 D001             28        POP AR1
+0025 D004             29        POP AR4
+0027 22               30        RET 
+                      31     
+0028                  32     readNibble:                        ; Function to read a nibble
+0028 C0E0             33        PUSH ACC
+002A C04F             34        PUSH 4FH
+002C 7590F0           35        MOV P1,#0F0H       ;Turn ON all LEDs
+002F 754F0A           36        MOV 4FH,#0AH 
+0032 120003           37        LCALL delay
+0035 759000           38        MOV P1,#00H
+0038 75900F           39        MOV P1,#0FH
+003B E590             40        MOV A,P1
+003D 540F             41        ANL A,#0FH
+003F 754F02           42        MOV 4FH,#02H
+0042 120003           43        LCALL delay
+0045 F54E             44        MOV 4EH,A                  ;Store nibble in location 4EH
+0047 C4               45        SWAP A
+0048 F590             46        MOV P1,A
+004A 754F0A           47        MOV 4FH,#0AH
+004D 120003           48        LCALL delay
+0050 759000           49        MOV P1,#00H
+0053 75900F           50        MOV P1,#0FH
+0056 E590             51        MOV A,P1
+0058 B400CD           52        CJNE A,#00H, readNibble
+005B D04F             53        POP 4FH
+005D D0E0             54        POP ACC
+005F 22               55        RET  
+                      56     
+0060                  57     packNibbles:                   ;Function to store a byte at 4FH
+A51 MACRO ASSEMBLER  LAB3_2                                                               08/11/2015 17:19:42 PAGE     2
+
+0060 C0E0             58        PUSH ACC
+0062 C000             59        PUSH AR0
+0064 120028           60        LCALL readNibble
+0067 E54E             61        MOV A,4EH
+0069 C4               62        SWAP A
+006A 120028           63        LCALL readNibble
+006D A84E             64        MOV R0,4EH
+006F 28               65        ADD A,R0
+0070 F54F             66        MOV 4FH,A                   ;Store byte in location 4FH
+0072 D000             67        POP AR0
+0074 D0E0             68        POP ACC
+0076 22               69        RET
+                      70     
+0077                  71     readValues:
+0077 C000             72        PUSH AR0
+0079 C001             73        PUSH AR1
+007B A850             74        MOV R0,50H
+007D A951             75        MOV R1,51H
+007F                  76        loop1: 
+007F 120060           77         LCALL packNibbles
+0082 A74F             78             MOV @R1,4FH
+0084 09               79             INC R1
+0085 D8F8             80             DJNZ R0,loop1
+0087 D001             81        POP AR1
+0089 D000             82        POP AR0
+008B 22               83        RET
+                      84     
+008C                  85     displayValues:
+008C C000             86        PUSH AR0
+008E C001             87        PUSH AR1
+0090 C0E0             88        PUSH ACC
+0092 C04F             89        PUSH 4FH
+0094 A850             90        MOV R0,50H
+0096 A951             91        MOV R1,51H
+0098 75900F           92        MOV P1,#0FH
+009B E590             93        MOV A,P1
+009D 540F             94        ANL A,#0FH                   ; Mask off LED ports
+009F C0E0             95        PUSH ACC
+00A1 C3               96        CLR C
+00A2 98               97        SUBB A,R0
+00A3 5480             98        ANL A,#80H
+00A5 B48029           99        CJNE A,#80H,stopled           ; A should be storing a negative number
+00A8 D0E0            100        POP ACC
+00AA                 101        do:
+00AA 29              102        ADD A,R1
+00AB 14              103        DEC A
+00AC F9              104        MOV R1,A
+00AD E7              105        MOV A,@R1
+00AE C0E0            106        PUSH ACC                     ;Stores value of pointed location
+00B0 54F0            107        ANL A,#0F0H                  ;Take MSB
+00B2 F590            108        MOV P1,A
+00B4 754F04          109        MOV 4FH,#04H
+00B7 120003          110        LCALL delay
+00BA D0E0            111        POP ACC
+00BC 540F            112        ANL A,#0FH                   ;Take LSB
+00BE C4              113        SWAP A
+00BF F590            114        MOV P1,A
+00C1 754F04          115        MOV 4FH,#04H
+00C4 120003          116        LCALL delay
+00C7 D04F            117        POP 4FH
+00C9 D0E0            118        POP ACC
+00CB D001            119        POP AR1
+00CD D000            120        POP AR0
+00CF 80BB            121        SJMP displayValues  
+00D1                 122         stopled:
+00D1 D0E0            123              POP ACC
+A51 MACRO ASSEMBLER  LAB3_2                                                               08/11/2015 17:19:42 PAGE     3
+
+00D3 C3              124              CLR C
+00D4 98              125              SUBB A,R0
+00D5 600C            126              JZ dothis  
+00D7 759050          127          MOV P1,#01010000B
+00DA D04F            128              POP 4FH
+00DC D0E0            129              POP ACC
+00DE D001            130              POP AR1
+00E0 D000            131              POP AR0
+00E2 22              132              RET
+00E3                 133               dothis:
+00E3 75900F          134               MOV P1,#0FH
+00E6 E590            135               MOV A,P1
+00E8 540F            136               ANL A,#0FH
+00EA 1200AA          137               LCALL do
+                     138               
+00ED                 139     shuffleBits:
+00ED C000            140        PUSH AR0
+00EF C001            141        PUSH AR1
+00F1 C002            142        PUSH AR2
+00F3 C0F0            143        PUSH B         ;To store value of B
+00F5 C0E0            144        PUSH ACC
+00F7 AA50            145        MOV R2,50H       ;Store number = N
+00F9 A951            146        MOV R1,51H       ;Store Pointer P (pointer to A)
+00FB A851            147        MOV R0,51H
+00FD 8552F0          148        MOV B,52H
+0100 C001            149        PUSH AR1
+0102 E9              150        MOV A,R1
+0103 2550            151        ADD A,50H
+0105 F9              152        MOV R1,A        ;R1 now points to location after last of array A
+0106 E6              153        MOV A,@R0
+0107 F7              154        MOV @R1,A
+0108 D001            155        POP AR1
+010A 08              156        INC R0           ;= P' ,leads P by 1 unit
+                     157        ; Array A now has an additional element A[0] after A[K-1]
+010B                 158        loop2:
+010B E6              159         MOV A,@R0
+010C 67              160             XRL A,@R1
+010D C000            161             PUSH AR0
+010F A8F0            162             MOV R0,B
+0111 F6              163             MOV @R0,A
+0112 D000            164             POP AR0
+0114 08              165             INC R0
+0115 09              166             INC R1
+0116 05F0            167             INC B
+0118 DAF1            168             DJNZ R2,loop2
+011A D0E0            169        POP ACC
+011C D0F0            170        POP B
+011E D002            171        POP AR2
+0120 D001            172        POP AR1
+0122 D000            173        POP AR0
+0124 22              174        RET
+                     175             
+                     176       
+                     177     
+                     178     ;======================MAIN====================
+                     179     
+0125                 180     MAIN:
+0125 7581CF          181     MOV SP,#0CFH;-----------------------Initialize STACK POINTER
+0128 755003          182     MOV 50H,#03H;------------------------Set value of K
+012B 755160          183     MOV 51H,#60H;------------------------Array A start location
+012E 754F00          184     MOV 4FH,#00H;------------------------Clear location 4FH
+0131 120077          185     LCALL readValues
+0134 755003          186     MOV 50H,#03H;------------------------Value of K
+0137 755160          187     MOV 51H,#60H;------------------------Array A start location
+013A 755270          188     MOV 52H,#70H;------------------------Array B start location
+013D 1200ED          189     LCALL shuffleBits
+A51 MACRO ASSEMBLER  LAB3_2                                                               08/11/2015 17:19:42 PAGE     4
+
+0140 755003          190     MOV 50H,#03H;------------------------Value of K
+0143 755170          191     MOV 51H,#70H;------------------------Array B start Location
+0146 7590A0          192        MOV P1,#10100000B      ;Denotes that shiftBits subroutine has completed, provide a value
+0149 754F06          193        MOV 4FH,#06H
+014C 120003          194        LCALL delay
+014F 12008C          195     LCALL displayValues;----------------Display the last four bits of elements on LEDs
+0152 80FE            196     here: SJMP here;---------------------WHILE loop(Infinite Loop)
+                     197     END
+                             ; ------------------------------------END MAIN------------------------------------
+                             
+                              
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+A51 MACRO ASSEMBLER  LAB3_2                                                               08/11/2015 17:19:42 PAGE     5
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR2. . . . . . . .  D ADDR   0002H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BACK . . . . . . .  C ADDR   0015H   A   
+BACK1. . . . . . .  C ADDR   0013H   A   
+BACK2. . . . . . .  C ADDR   0011H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+DISPLAYVALUES. . .  C ADDR   008CH   A   
+DO . . . . . . . .  C ADDR   00AAH   A   
+DOTHIS . . . . . .  C ADDR   00E3H   A   
+HERE . . . . . . .  C ADDR   0152H   A   
+LOOP . . . . . . .  C ADDR   000FH   A   
+LOOP1. . . . . . .  C ADDR   007FH   A   
+LOOP2. . . . . . .  C ADDR   010BH   A   
+MAIN . . . . . . .  C ADDR   0125H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+PACKNIBBLES. . . .  C ADDR   0060H   A   
+READNIBBLE . . . .  C ADDR   0028H   A   
+READVALUES . . . .  C ADDR   0077H   A   
+SHUFFLEBITS. . . .  C ADDR   00EDH   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+STOPLED. . . . . .  C ADDR   00D1H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

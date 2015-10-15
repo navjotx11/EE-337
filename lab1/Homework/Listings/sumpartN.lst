@@ -1,0 +1,51 @@
+A51 MACRO ASSEMBLER  SUMPARTN                                                             07/26/2015 15:11:20 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\sumpartN.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE sumpartN.asm SET(SMALL) DEBUG PRINT(.\Listings\sumpartN.lst) OBJECT(.\O
+                      bjects\sumpartN.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; Sum of N natural numbers
+                       2     
+0000                   3     ORG 00H
+0000 020100            4     LJMP MAIN
+                       5     
+0003 29                6     ADDNOS: ADD A,R1
+0004 F6                7             MOV @R0,A
+0005 08                8             INC R0
+0006 09                9                     INC R1     
+0007 D550F9           10             DJNZ 50H,ADDNOS
+000A 22               11                     RET
+                      12     
+0100                  13     ORG 100H
+0100                  14     MAIN: 
+                      15           USING 0
+0100 75500B           16               MOV 50H,#0BH ; specify N in 50H
+0103 7851             17               MOV R0,#51H
+0105 7901             18               MOV R1,#01H
+0107 E4               19               CLR A
+0108 120003           20               LCALL ADDNOS
+                      21               
+010B 80FE             22     FIN:  SJMP FIN 
+                      23               
+*** WARNING #A41 IN 23 (sumpartN.asm, LINE 23): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  SUMPARTN                                                             07/26/2015 15:11:20 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ADDNOS . . . . . .  C ADDR   0003H   A   
+FIN. . . . . . . .  C ADDR   010BH   A   
+MAIN . . . . . . .  C ADDR   0100H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)

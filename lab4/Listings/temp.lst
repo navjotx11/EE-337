@@ -1,0 +1,64 @@
+A51 MACRO ASSEMBLER  TEMP                                                                 08/17/2015 21:57:33 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\temp.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE temp.asm SET(SMALL) DEBUG PRINT(.\Listings\temp.lst) OBJECT(.\Objects\t
+                      emp.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 000h
+0000 020014            2     ljmp delay5
+                       3     
+                       4     using 0
+                       5     
+                       6     
+0003 C003              7     delay:   push ar3
+0005 C004              8              push ar4
+0007 7B01              9              mov r3,#1
+0009 7CFF             10     loop2:   mov r4,#255
+000B DCFE             11     loop1:   djnz r4, loop1
+000D DBFA             12                      djnz r3,loop2
+000F D004             13                      pop ar4
+0011 D003             14                      pop ar3
+0013 22               15                      ret
+                      16     ;---------------------5secdelay------------------------------------------------------------
+0014                  17     delay5:
+0014 C003             18           push ar3
+0016 C004             19               push ar4
+0018 7B64             20           mov r3,#100
+001A                  21               looper1:
+001A 7CC8             22               mov r4,#200
+001C                  23               looper2:
+001C 120003           24               lcall delay
+001F DCFB             25               djnz r4,looper2
+0021 DBF7             26               djnz r3,looper1
+0023 D004             27               pop ar4
+0025 D003             28               pop ar3
+0027 22               29               ret
+                      30               
+                      31     end
+                                     
+A51 MACRO ASSEMBLER  TEMP                                                                 08/17/2015 21:57:33 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AR3. . . . . . . .  D ADDR   0003H   A   
+AR4. . . . . . . .  D ADDR   0004H   A   
+DELAY. . . . . . .  C ADDR   0003H   A   
+DELAY5 . . . . . .  C ADDR   0014H   A   
+LOOP1. . . . . . .  C ADDR   000BH   A   
+LOOP2. . . . . . .  C ADDR   0009H   A   
+LOOPER1. . . . . .  C ADDR   001AH   A   
+LOOPER2. . . . . .  C ADDR   001CH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

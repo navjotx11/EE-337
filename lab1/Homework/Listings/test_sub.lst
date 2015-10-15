@@ -1,0 +1,46 @@
+A51 MACRO ASSEMBLER  TEST_SUB                                                             07/28/2015 20:25:52 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\test_sub.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE test_sub.asm SET(SMALL) DEBUG PRINT(.\Listings\test_sub.lst) OBJECT(.\O
+                      bjects\test_sub.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 00H
+0000 020011            2     LJMP MAIN
+                       3     
+0003                   4     DO:
+0003 7480              5      MOV A,#80H
+0005 9401              6      SUBB A,#01H
+0007 F561              7      MOV 61H,A
+0009 20D201            8      JB PSW.2,RETURN
+000C 22                9      RET
+                      10      
+000D                  11     RETURN:
+000D 756001           12      MOV 60H,# 01H
+0010 22               13      RET 
+                      14     
+0011                  15     MAIN:
+0011 120003           16      LCALL DO  
+                      17       
+*** WARNING #A41 IN 17 (test_sub.asm, LINE 17): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  TEST_SUB                                                             07/28/2015 20:25:52 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DO . . . . . . . .  C ADDR   0003H   A   
+MAIN . . . . . . .  C ADDR   0011H   A   
+PSW. . . . . . . .  D ADDR   00D0H   A   
+RETURN . . . . . .  C ADDR   000DH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)

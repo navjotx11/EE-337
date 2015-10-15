@@ -1,0 +1,142 @@
+A51 MACRO ASSEMBLER  QUES2                                                                08/22/2015 12:13:26 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\ques2.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE ques2.asm SET(SMALL) DEBUG PRINT(.\Listings\ques2.lst) OBJECT(.\Objects
+                      \ques2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 000H
+0000 02007C            2     ljmp main
+                       3     
+0003                   4     matMult:
+                       5     
+                       6     using 0
+0003 C0E0              7     push acc
+0005 C0F0              8     push b
+0007 C000              9     push ar0
+0009 C001             10     push ar1
+000B 7A60             11     mov r2,#60H
+000D                  12     row1:        ;code to find first row of C
+000D 7850             13      mov r0,#50H  
+000F 7955             14      mov r1,#55H
+0011 E6               15      mov a,@r0
+0012 87F0             16      mov b,@r1
+0014 120066           17      lcall multrc
+0017 C000             18      push ar0
+0019 C0E0             19      push acc
+001B EA               20      mov a,r2
+001C F8               21      mov r0,a
+001D D0E0             22      pop acc
+001F F6               23      mov @r0,a
+0020 D000             24      pop ar0
+0022 0A               25      inc r2
+0023 09               26      inc r1
+0024 E6               27      mov a,@r0
+0025 87F0             28      mov b,@r1
+0027 120066           29      lcall multrc
+002A C000             30      push ar0
+002C C0E0             31      push acc
+002E EA               32      mov a,r2
+002F F8               33      mov r0,a
+0030 D0E0             34      pop acc
+0032 F6               35      mov @r0,a
+0033 D000             36      pop ar0
+0035 0A               37      inc r2
+                      38      
+0036                  39     row2:
+0036 7852             40      mov r0,#52H  
+0038 7955             41      mov r1,#55H
+003A E6               42      mov a,@r0
+003B 87F0             43      mov b,@r1
+003D 120066           44      lcall multrc
+0040 C000             45      push ar0
+0042 C0E0             46      push acc
+0044 EA               47      mov a,r2
+0045 F8               48      mov r0,a
+0046 D0E0             49      pop acc
+0048 F6               50      mov @r0,a
+0049 D000             51      pop ar0
+004B 0A               52      inc r2
+004C 09               53      inc r1
+004D E6               54      mov a,@r0
+004E 87F0             55      mov b,@r1
+0050 120066           56      lcall multrc
+0053 C000             57      push ar0
+A51 MACRO ASSEMBLER  QUES2                                                                08/22/2015 12:13:26 PAGE     2
+
+0055 C0E0             58      push acc
+0057 EA               59      mov a,r2
+0058 F8               60      mov r0,a
+0059 D0E0             61      pop acc
+005B F6               62      mov @r0,a
+005C D000             63      pop ar0
+                      64      
+005E D001             65      pop ar1
+0060 D000             66      pop ar0
+0062 D0F0             67      pop b
+0064 D0E0             68      pop acc
+                      69       
+0066                  70     multrc:                  ;Subroutine to multiply row and column and store restult in Regist
+                             er A
+0066 C000             71     push ar0
+0068 C001             72     push ar1
+006A A4               73     mul ab
+006B 08               74     inc r0
+006C 09               75     inc r1
+006D 09               76     inc r1
+006E C0E0             77     push acc
+0070 E6               78     mov a,@r0
+0071 87F0             79     mov b,@r1
+0073 A4               80     mul ab                   ;Lower byte is stored in A
+0074 D003             81     pop ar3
+0076 2B               82     add a,r3
+0077 D001             83     pop ar1
+0079 D000             84     pop ar0
+007B 22               85     ret
+                      86      
+                      87     
+                      88     
+007C                  89     main:
+007C 7581CF           90      mov SP,#0CFH
+007F 755001           91      mov 50h,#01
+0082 755100           92      mov 51h,#00
+0085 755200           93      mov 52h,#00
+0088 755300           94      mov 53h,#00
+008B 755501           95      mov 55h,#01
+008E 755602           96      mov 56h,#02
+0091 755703           97      mov 57h,#03
+0094 755804           98      mov 58h,#04
+                      99      
+0097 120003          100      lcall matMult
+                     101     
+009A 80FE            102     stop: sjmp stop
+                     103     end
+A51 MACRO ASSEMBLER  QUES2                                                                08/22/2015 12:13:26 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ACC. . . . . . . .  D ADDR   00E0H   A   
+AR0. . . . . . . .  D ADDR   0000H   A   
+AR1. . . . . . . .  D ADDR   0001H   A   
+AR3. . . . . . . .  D ADDR   0003H   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+MAIN . . . . . . .  C ADDR   007CH   A   
+MATMULT. . . . . .  C ADDR   0003H   A   
+MULTRC . . . . . .  C ADDR   0066H   A   
+ROW1 . . . . . . .  C ADDR   000DH   A   
+ROW2 . . . . . . .  C ADDR   0036H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+STOP . . . . . . .  C ADDR   009AH   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
